@@ -1,0 +1,77 @@
+[DEVICE]
+Name=ATMEGA8
+Clock=8000000
+[MEMORY_MODEL]
+Value=-1
+[BUILD_TYPE]
+Value=0
+[BOOT_TYPE]
+Value=0
+[ACTIVE_TAB]
+Value=7segment displays.mbas
+[USE_EEPROM]
+Value=0
+[USE_HEAP]
+Value=0
+[HEAP_SIZE]
+Value=2000
+[EEPROM_DEFINITION]
+Value=
+[EXPANDED_NODES]
+0=7segment displays.mbpav
+Count=1
+[FILES]
+Count=1
+File0=7segment displays.mbas
+[BINARIES]
+Count=0
+[IMAGES]
+Count=0
+ActiveImageIndex=-1
+[OPENED_FILES]
+Count=5
+File0=7segment displays.mbas
+File1=Libs\seven_segment.mbas
+File2=Libs\PWM_timers_2017.mbas
+File3=Libs\Alarm_clock.mbas
+File4=Libs\EEProm.mbas
+[EEPROM]
+Count=0
+[ACTIVE_COMMENTS_FILES]
+Count=0
+[OTHER_FILES]
+Count=0
+[SEARCH_PATH]
+Count=5
+Path0=E:\Program Files (x86)\mikroBasic PRO for AVR2\defs\
+Path1=E:\Program Files (x86)\mikroBasic PRO for AVR2\uses\lte64kw\
+Path2=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\
+Path3=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2\
+Path4=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy\
+[HEADER_PATH]
+Count=0
+[HEADERS]
+Count=0
+[PLDS]
+Count=0
+[Useses]
+Count=16
+File0=Button
+File1=Compact_Flash_FAT16
+File2=Conversions
+File3=EEPROM
+File4=Mmc_FAT16
+File5=Mmc_FAT16_Defs
+File6=PWM1
+File7=PWM16bit
+File8=PWM2
+File9=SPI_Ethernet
+File10=SPI_Ethernet_24j600
+File11=Time
+File12=PWM
+File13=String
+File14=Trigon
+File15=Trigonometry
+[EXPANDED NODES]
+Node1=Sources
+Count=1

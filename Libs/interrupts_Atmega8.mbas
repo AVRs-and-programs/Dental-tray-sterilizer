@@ -1,0 +1,253 @@
+module interrupts_Atmega8
+
+
+#IFDEF ATmega128
+  symbol INT_Keypad_importing_menu_Port_my  = PIND
+  symbol INT_Keypad_importing_menu_bit_my =   2
+  symbol INT0_Port_my = PIND
+  symbol INT0_bit_my=   0
+  symbol INT6_Port_my  = PINE
+  symbol INT6_bit_my =   6
+  symbol INT_heater_SW=  IVT_ADDR_INT6
+  symbol INT_heater_SW_Bit_Enable= INT6_bit
+  symbol INT_Keypad_importing_menu=  IVT_ADDR_INT2
+'  symbol INT_Keypad_importing_menu=  IVT_ADDR_INT2
+  symbol INT_Keypad_importing_menu_bit_enable = INT2_bit
+#ENDIF
+
+#IFDEF ATmega8
+ ' symbol INT2_Port_my  = PINB
+'  symbol INT2_bit_my =   2
+  symbol INT_Keypad_importing_menu_Port_my = PIND
+  symbol INT_Keypad_importing_menu_bit_my=   2
+  symbol INT1_Port_my  = PIND
+  symbol INT1_bit_my =   3
+  symbol INT_heater_SW=  IVT_ADDR_INT1
+  symbol INT_heater_SW_Bit_Enable= INT1_bit
+  symbol INT_Keypad_importing_menu=  IVT_ADDR_INT2
+  symbol INT_Keypad_importing_menu_bit_enable = INT2_bit
+#ENDIF
+dim while_state_import_main,while_state_import_main2 as bit external
+dim Interupt_first_time,Interupt_first_time2, on_test as byte external
+dim hours, minutes, seconds, day, week, month, year as byte external   ' Global date/time variables
+dim Pwm_chanel,chanel,on_off2,week_new as byte external
+dim txt,txt3 ,txt1 as string[19] external
+
+dim oldstate,oldstate_up,oldstate_down,oldstate_ok,oldstate_ww,while_state,while_satate_in_1 as bit   external
+
+'dim on_a_0 as Byte[1][4][3][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]     4 end changed to 5 for adding second setting to on...
+'dim on_a_1 as Byte[7][4][7][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]     4 end changed to 5 for adding second setting to on...
+'dim on_a_1 as integer[7][4][7][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]
+'dim on_a_0 as byte[7][1][3][2][4]   external'' on_a_0 [week-1][chanel-1][pwm_chanel-1][on_off22-1][0]
+
+sub procedure interrupt_ini ()
+'sub procedure interrupt_ISR_0 () org IVT_ADDR_INT0            ''// Interrupt rutine
+sub procedure interrupt_ISR () org INT_Keypad_importing_menu            ''// Interrupt rutine
+sub procedure interrupt_ISR_6 () org INT_heater_SW            ''// Interrupt rutine
+#IFDEF ATmega128
+       sub procedure interrupt_ISR_6 () org INT_heater_SW            ''// Interrupt rutine
+#ENDIF
+implements
+sub procedure delay_ms_my (dim ttt as integer)
+    dim t_fl as integer
+    if ttt>=100 then
+        t_fl=integer (ceil((ttt)/100))
+        for ttt=1 to t_fl
+        delay_ms(100)
+    next ttt
+    else
+        t_fl=integer (ceil((ttt)/10))
+        for ttt=1 to t_fl
+        delay_ms(10)
+    next ttt
+    end if
+
+
+
+end sub
+sub procedure interrupt_ini ()
+        if Interupt_first_time=0 then
+'             #IFDEF ATmega128
+'                 ' ##########   Interupt 2 enalbleing   ##########
+'                Interupt_first_time=0 Interupt_first_time2=0
+'                ISC20_Bit = 1                                    '' // Set interrupts to be detected on rising edge
+'                ISC00_bit = 1
+'                INTF2_bit = 0
+'                SREG_I_bit = 0
+'                Delay_ms(100)                                  ''  // Enable Interrupts
+'
+'
+'                INT2_bit =1
+'                INT1_bit =1
+'                INT6_bit =1
+'                SREG_I_bit = 1
+'            '#########################################
+'            #ENDIF
+'             #IFDEF ATmega32
+                 ' ##########   Interupt 2 enalbleing   ##########
+                Interupt_first_time=0 Interupt_first_time2=0
+'                MCUCR =0x00
+
+'                // Signal change triggers interrupt
+                'MCUCR = ( 1 << ISC00)
+'                MCUCR = ( 0 << ISC01)
+'                ISC2_Bit = 1                                 '' // Set interrupts to be detected on rising edge
+                ISC00_bit = 1
+                INTF2_bit = 0
+                SREG_I_bit = 0
+                Delay_ms(100)                                  ''  // Enable Interrupts
+
+
+'                GICR = ( 1 <<INT0) or ( 1 << INT1) or ( 1 << INT2)
+                INT2_bit =1
+                INT1_bit =1
+                INT0_bit =1
+                SREG_I_bit =1
+                Interupt_first_time=1 Interupt_first_time2=1
+            '#########################################
+'            #ENDIF
+         Lcd_0()Lcd_Out(1,1,"Int") Lcd_Out(2,1,"For First") delay_ms(200)
+        end if
+end sub
+sub procedure interrupt_ISR () org INT_Keypad_importing_menu            ''// Interrupt rutine
+'dim while_satate_in_1 as bit
+
+  if (Interupt_first_time=0) or (Interupt_first_time=2) then
+     Lcd_0()
+     if Interupt_first_time=2 then
+         Lcd_Out(1,1,"or Interupt_Ht=2")
+     else
+         Lcd_Out(1,1,"Interupt_first_time=0")
+     end if
+     Delay_mS(1000)
+     Interupt_first_time=1
+  else
+'   SREG_I_bit = 0                                   '' // Disable Interrupts
+   Interupt_first_time=1
+'   WDT_on()
+'  INTF2_bit=0                                                  '  // Clear interrupt flag
+   INT_Keypad_importing_menu_bit_enable = 0
+  ' ## ############## Because of Disappering the Pwm Part we need to run this comands #########################
+'     while_state_import_main=0
+    'Keypad_set__date_time_import_On_hour_teben(week,hours,minutes,23,0)
+'    Keypad_set__date_time_import_On_minut_teben(week,on_a_0[week-1][chanel-1][Pwm_chanel-1][on_off2-1][1],minutes,59,0)
+'    Keypad_set__date_time_import_Yes_No_teben( week,chanel,1, 2,1 )
+'    Keypad_set__date_time_import_PWM_Red_teben(1,1,on_a_0[week_new-1][chanel-1][Pwm_chanel-1][on_off2-1][3],100,0,on_a_0[week_new-1][0][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][1][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][2][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][3][Pwm_chanel-1][on_off2-1][3],0,0,0,0,0)''on_a_0[week_new-1][4][Pwm_chanel-1][on_off2-1][3],0,0,0,0) ''on_a_0[week_new-1][5][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][6][Pwm_chanel-1][on_off2-1][3],0,0) ''on_a_0[week_new-1][7][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][8][Pwm_chanel-1][on_off2-1][3]) ''(dim mode_1,Pwm_chanel,var_in as byte, dim p_max as  byte, dim p_min as  byte )
+'    Keypad_set__date_time_import_save_exit_teben (week,1,1,0)
+'    while_state_import_main=1
+
+ ' ## ############## Because of Disappering the Pwm Part  we need to run this comands #########################
+
+'  Keypad_3()
+   Keypad_start()
+
+   'txt1 = "<int is selected"
+'       Lcd_Out(1,1,txt1)
+'if (Button(INT_Keypad_importing_menu_Port_my, INT_Keypad_importing_menu_bit_my, 0.1, 1)<> 0) then    ' Detect logical one setting key
+'      oldstate = 1
+'      Lcd_0()
+'      'txt1 = "<Exit is selected>"
+'       'Lcd_Out(1,1,txt1)
+'      Delay_mS(400)                      ' Update flag
+'   end if
+'    if (oldstate and Button(INT_Keypad_importing_menu_Port_my, INT_Keypad_importing_menu_bit_my, 0.1, 0)) then    ' Detect one-to-zero transition
+'       oldstate = 0
+'       txt1 = "<good>"
+'       Lcd_Out(1,1,txt1)
+'           Delay_mS(400)
+'     end if
+  '/* Turn off WDT */
+
+'  WDTCR = 0x00
+  INT_Keypad_importing_menu_bit_enable = 1
+  Interupt_first_time=Interupt_first_time+1
+'  LCD_Out(1,1, "?nd of keypad3")   Delay_mS(1000)
+'  SREG_I_bit = 1                                  ''  // Enable Interrupts
+'   Lcd_0()
+'    LCD_Out(1,1, "?nd of interuppt")
+'        inttostr(on_a_0 [week-1][chanel-1][pwm_chanel-1][on_off2-1][0],txt)                     ' ??? ????? ???? ? ?????? ????? ? ????
+'           LCD_Out(1,11, txt)
+'            inttostr(week,txt)
+'            LCD_Out(2,11, txt)
+'            Delay_mS(1000)
+ end if
+end sub
+
+sub procedure interrupt_ISR_6 () org INT_heater_SW            ''// Interrupt rutine
+'dim while_satate_in_1 as bit
+
+  if (Interupt_first_time=0) or (Interupt_first_time=2) then
+     Lcd_0()
+     if Interupt_first_time=2 then
+         Lcd_Out(1,1,"or Interupt_Ht=2")
+     else
+         Lcd_Out(1,1,"Interupt_first_time=0")
+     end if
+     Delay_mS(1000)
+     Interupt_first_time=1
+  else
+
+'        SREG_I_bit = 0                                   '' // Disable Interrupts
+
+'         WDT_on()
+      '  INTF2_bit=0                                                  '  // Clear interrupt flag
+        INT_heater_SW_Bit_Enable = 0
+        ' ## ############## Because of Disappering the Pwm Part we need to run this comands #########################
+      ' while_state_import_main=0
+      'Keypad_set__date_time_import_On_hour_teben(week,hours,minutes,23,0)
+      'Keypad_set__date_time_import_On_minut_teben(week,on_a_0[week-1][chanel-1][Pwm_chanel-1][on_off2-1][1],minutes,59,0)
+      'Keypad_set__date_time_import_Yes_No_teben( week,chanel,1, 2,1 )
+      'Keypad_set__date_time_import_PWM_Red_teben(1,1,on_a_0[week_new-1][chanel-1][Pwm_chanel-1][on_off2-1][3],100,0,on_a_0[week_new-1][0][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][1][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][2][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][3][Pwm_chanel-1][on_off2-1][3],0,0,0,0,0)''on_a_0[week_new-1][4][Pwm_chanel-1][on_off2-1][3],0,0,0,0) ''on_a_0[week_new-1][5][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][6][Pwm_chanel-1][on_off2-1][3],0,0) ''on_a_0[week_new-1][7][Pwm_chanel-1][on_off2-1][3],on_a_0[week_new-1][8][Pwm_chanel-1][on_off2-1][3]) ''(dim mode_1,Pwm_chanel,var_in as byte, dim p_max as  byte, dim p_min as  byte )
+      'Keypad_set__date_time_import_save_exit_teben (week,1,1,0)
+      'while_state_import_main=1
+       ' ## ############## Because of Disappering the Pwm Part  we need to run this comands #########################
+        chanel=1
+'        Easy_vacuum_95_10_4_simple(chanel,1)
+'         PIND6_bit =1
+        Easy_vacuum_95_10_4_simple_working(1,1,0)
+        Lcd_Out(1,1,txt1)
+
+        '/* Turn off WDT */
+
+'        WDTCR = 0x00
+        INT_heater_SW_Bit_Enable = 1  ''simulating pressed  INT6 button by 1 in this bit
+
+'        SREG_I_bit = 1                                  ''  // Enable Interrupts
+  end if
+
+end sub
+'
+'
+sub procedure interrupt_ISR_0 () org IVT_ADDR_INT0            ''// Interrupt rutine
+'dim while_satate_in_1 as bit
+
+  SREG_I_bit = 0                                   '' // Disable Interrupts
+
+  INTF0_bit=0                                                  '  // Clear interrupt flag
+  INT0_bit = 0
+  timer_setting(1)
+  '/* Turn off WDT */
+  oldstate_setting=0
+  while  (while_state_setting<11)
+    if (Button(Start_SW_Port, Start_SW_bit, 255, 1)) then    ' Detect logical one up key
+           oldstate_setting = 1                      ' Update flag
+    end if
+    if (oldstate_setting and Button(Start_SW_Port, Start_SW_bit,50,0)) then
+        while_state_setting=11 oldstate_setting=0
+    
+  
+  wend
+  INT0_bit = 1
+'  LCD_Out(1,1, "nd of keypad3")   Delay_mS(1000)
+  SREG_I_bit = 1                                  ''  // Enable Interrupts
+'   Lcd_0()
+'    LCD_Out(1,1, "nd of interuppt")
+'        inttostr(on_a_0 [week-1][chanel-1][pwm_chanel-1][on_off2-1][0],txt)                     ' ??? ????? ???? ? ?????? ????? ? ????
+'           LCD_Out(1,11, txt)
+'            inttostr(week,txt)
+'            LCD_Out(2,11, txt)
+'            Delay_mS(1000)
+end sub
+
+
+end.

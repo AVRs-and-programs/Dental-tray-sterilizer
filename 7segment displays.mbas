@@ -1,0 +1,291 @@
+program _7segment_displays
+
+'include "All_Digital_Library"
+include "Libs/seven_segment"
+ include "Libs/PWM_timers_2017"
+ include "Libs/Alarm_clock"
+ include "Libs/EEProm"
+
+
+ 
+
+  symbol Start_SW_Port  = PINB
+  symbol Start_SW_bit =   0
+
+  symbol Up_SW_Port  = PINB
+  symbol UP_SW_bit =   4
+  symbol Down_SW_Port  = PINB
+  symbol Down_SW_bit =   5
+  symbol off_period = 10
+'  symbol Off_state = 0
+  symbol Choice_number = 3
+  'symbol Heater_pwm_num = 1
+'  symbol Motor_pwm_num = 2
+  symbol MOTOR_relay_Pin =PINB3_bit
+   symbol Ready_min_interval= 3
+
+' include "Libs/LCD_1"
+dim n,nn,terget_final   as integer
+dim jj,j as byte
+dim end_flag as bit
+dim counter1,second_alarm_clock as byte
+    minutes_alarm_clock,hours_alarm_clock  as byte
+ dim st as string[4]
+dim txt as string[19]
+dim hours, minutes, seconds, day, week, month2, year as byte
+dim Start_hours, Start_minutes, Start_seconds, Start_day, Start_week, Start_month, Start_year as byte
+dim target_hr,target_min,target_sec,target_interval,target_pwm,target_enable as byte
+
+dim Mot_On_mSec as Byte[5]  ''[sec_interval-> 4][PWM-> 3][MIN -> 2][SEC->2][Enable-> 0]
+ 
+DIM oldstate_1,oldstate_2,oldstate_3,oldstate_setting AS BIT
+    while_state,while_state_setting,while_state_setting_2,while_state_help as byte
+ 
+ const _THRESHOLD = 16
+ 
+dim counter as byte
+'
+'sub procedure Timer1Overflow_ISR iv IVT_ADDR_TIMER1_OVF
+'  if (counter >= _THRESHOLD) then
+'    PORTB = not PORTB        ' toggle PORTB
+'    counter = 0              ' reset counter
+'    else
+'      Inc(counter)           ' increment counter
+'  end if
+'end sub
+sub procedure  port_ini()
+    DDB0_BIT=0           PORTB0_BIT=0
+    DDB4_BIT=0           PORTB4_BIT=0
+    DDB5_BIT=0           PORTB5_BIT=0
+END SUB
+
+sub procedure  seven_segment_add()
+    terget_final=integer(target_min*100)+integer(target_sec) Display_Number(terget_final) ''delay_us(100)
+END SUB
+
+ sub procedure ok()
+   while_state=0 Start_seconds=second_alarm_clock
+   oldstate_setting=0    while_state_setting=11 
+'   dispaly_time()
+'   Display_Number_2(0,"GO")
+   if (end_flag=1) then
+      Display_Number_2(0,"redy") Display_Number_2(0,"    ")
+   end if
+   if (end_flag=0) then
+
+          for j=1 to 50
+            Display_Number(minutes_alarm_clock*100+second_alarm_clock)
+          next j
+      if  minutes_alarm_clock<target_min+Ready_min_interval then
+            Display_Number_2(0,"END") Display_Number_2(0,"    ")
+      else
+            Display_Number_2(0,"redy") Display_Number_2(0,"    ")
+      end if
+    end if
+   while_state_setting_2=11  while_state_help=0
+   oldstate_1=0 oldstate_2=0 oldstate_3=0
+   while (while_state<11)
+        inc(while_state)
+'       if Start_seconds<> second_alarm_clock then  while_state=11 end if
+       if (Button(Start_SW_Port, Start_SW_bit, 70, 1)) then    ' Detect logical one up key
+          oldstate_1 = 1                      ' Update flag
+       end if
+       if (oldstate_1 and Button(Start_SW_Port, Start_SW_bit,50,0)) then
+           oldstate_1=0   while_state=11
+           reset_alarm_clock()                           'Reset laram click for better counting
+           
+           motor_on_off()
+          ' for j=0 to 10
+'             nn=floor(j*255/10)
+'             PWM2_Set_Duty(nn) delay_ms(100) Display_Number(nn)
+'           next j
+           'for j=10 to 0 step -1
+'           PWM2_Set_Duty((j*255) div 10)
+'           next j
+       end if
+       
+       if (Button(Up_SW_Port, Up_SW_bit, 5, 1))then
+           oldstate_2=1  while_state_setting=0
+       end if
+       if (Button(Down_SW_Port, Down_SW_bit, 5, 1)) then    ' Detect logical one up key
+           oldstate_3 = 1   while_state_setting=0           ' Update flag
+       end if
+        
+'       Display_Number(minutes_alarm_clock*100+second_alarm_clock)
+'        if (oldstate_setting and Button(Start_SW_Port, Start_SW_bit,50,0)) then
+         if TRUE then
+            oldstate_setting=0
+            while  (while_state_setting<11 or ((oldstate_2=1) or (oldstate_3=1)) or (while_state_help=1) )
+                 seven_segment_add()  while_state_help=1
+                 '@@@@@@@@@@    test if SAVE switch is holded @@@@@@@@@@@@@@
+                 if (Button(Start_SW_Port, Start_SW_bit, 100, 1)) then    ' Detect logical one up key
+                     oldstate_setting = 1   while_state_setting_2=0                   ' Update flag
+                 end if
+                 while while_state_setting_2=0
+                 if (oldstate_setting and Button(Start_SW_Port, Start_SW_bit,50,0)) then
+                    while_state_setting=11 oldstate_setting=0 while_state_setting_2=1 while_state_help=0
+                    target_enable=1              nn=9999
+
+                    for j=1 to 5
+                    Display_Number_2(0,"save")
+                    next j
+                    Display_Number_2(0,"    ")
+                    eeprom_save()
+                 end if
+                 wend
+                 '@@@@@@@@@@    END OF  SAVE switch is holded @@@@@@@@@@@@@@
+
+'               Display_Number(target_sec)
+'               inc(while_state_setting)
+               if (Button(Up_SW_Port, Up_SW_bit, 40, 1))then    ' Detect logical one up key
+                  oldstate_2 = 1                      ' Update flag
+
+                while_state_setting=1
+               end if
+               if (oldstate_2 and Button(Up_SW_Port, Up_SW_bit,50,0)) then
+                   oldstate_2=0 while_state_help=1
+                   timer_setting(1) seven_segment_add()
+               end if
+               
+               '@@@@@@@@@@    test if UP switch is holded @@@@@@@@@@@@@@
+               if (Button(Up_SW_Port, Up_SW_bit,200, 1))then    ' Detect logical one up key
+                  oldstate_2 = 1                      ' Update flag
+
+                  while_state_setting_2=0
+               end if
+               while while_state_setting_2=0
+                   timer_setting(1)  seven_segment_add()
+                   if (oldstate_2 and Button(Up_SW_Port, Up_SW_bit,50,0)) then
+                       oldstate_2=0 while_state_setting_2=11 while_state=1 while_state_setting=1  while_state_help=1
+
+                   end if
+               wend
+               ' @@@@@@@@@@@ End of UP Switch is Holded @@@@@@@@@@@@@@@@@@@@
+               
+               if (Button(Down_SW_Port, Down_SW_bit, 40, 1)) then    ' Detect logical one up key
+                  oldstate_3 = 1                      ' Update flag
+               end if
+               if (oldstate_3 and Button(Down_SW_Port, Down_SW_bit,50,0)) then
+                   oldstate_3=0
+                   timer_setting(0) seven_segment_add() while_state_help=1
+'                   terget_final=target_min*100+target_sec
+'                   Display_Number(terget_final)
+'                   Display_Number(target_sec)
+               end if
+                '@@@@@@@@@@    test if down switch is holded @@@@@@@@@@@@@@
+               if (Button(Down_SW_Port, Down_SW_bit,200, 1))then    ' Detect logical one up key
+                  oldstate_3 = 1                      ' Update flag
+
+                 while_state_setting_2=0
+               end if
+               while while_state_setting_2=0
+
+                   timer_setting(0) seven_segment_add()
+                   if (oldstate_3 and Button(Down_SW_Port,Down_SW_bit,50,0)) then
+                       oldstate_3=0 while_state_setting_2=11  while_state=1 while_state_setting=1  while_state_help=1
+
+                   end if
+               wend
+               ' @@@@@@@@@@@ End of holded Down Switch @@@@@@@@@@@@@@@@@@@@
+           wend
+      end if
+'      seven_segment_add()
+'       Display_Number(minutes_alarm_clock*100+second_alarm_clock)
+'       dispaly_time()
+   wend
+end sub
+' sub procedure motor_on_off(dim target_min_mot,target_sec_mot as byte)
+
+'
+main:
+
+'  timer2_init()
+'   DDRB  = 0xFF               ' set PORTB as output
+'  PORTB = 0                  ' clear PORTB
+
+
+
+''
+'  while TRUE
+'    nop                      ' Endless loop, port is changed inside Interrupt Service Routine (ISR)
+'  wend
+
+
+   timer1_init()  port_ini() ' int_eeprom_ini()
+
+   PWM_Port_Initialize () PWM2_Init(_PWM2_PHASE_CORRECT_MODE, _PWM2_PRESCALER_8, _PWM2_NON_INVERTED,0)
+   int_eeprom_ini()
+'   PWM_Initialize ()
+'   delay_ms(100) PWM2_Set_Duty(0)
+'   PWM_MAKE (1,255,1)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'  timer2_init()
+
+
+
+              
+  seconds=0 minutes=0 hours=0  '' target_sec=12      target_min=0
+  n=0  end_flag=1
+  Display_Init()
+  delay_ms(100)
+
+'  reset_alarm_clock()
+'  Display_Number(second_alarm_clock)
+
+     while TRUE
+'         seconds=second_alarm_clock minutes=minutes_alarm_clock hours=hours_alarm_clock
+'         delay_ms(100)
+'         Start_seconds=second_alarm_clock Start_minutes=minutes_alarm_clock Start_hours=hours_alarm_clock
+'         DS1307(hours, minutes, seconds) 'seconds=target_sec minutes=target_min hours=target_hr
+         ok()
+
+'          Display_Number(minutes_alarm_clock*100+second_alarm_clock)
+'         motor_on_off()
+'          Display_Number(1)
+'          Display_text("END")
+
+
+
+
+
+
+'         inc(j)
+'         if second_alarm_clock>=15 then reset_alarm_clock() end if
+'         DS1307(hours, minutes, seconds)
+'         Display_Number(second_alarm_clock)
+'         Display_Number(target_sec)
+'         PWM_MAKE (N MOD 100,255,1)
+'          Display_Number( n)
+'          PWM2_Set_Duty(0)
+'          delay_ms(100)
+      wend
+
+      while TRUE
+      for n = 0 to 1000
+'         Display_Number(n)
+'
+      next n
+      delay_ms(100)
+      Display_Number(9999)
+      delay_ms(5000)
+
+     wend
+
+ ' do {
+'    digit = number / 1000u ;             // extract thousands digit
+'    portd_array[3] = mask(digit);        // and store it to PORTD array
+'    digit = (number / 100u) % 10u;       // extract hundreds digit
+'    portd_array[2] = mask(digit);        // and store it to PORTD array
+'    digit = (number / 10u) % 10u;        // extract tens digit
+'    portd_array[1] = mask(digit);        // and store it to PORTD array
+'    digit = number % 10u;                // extract ones digit
+'    portd_array[0] = mask(digit);        // and store it to PORTD array
+'
+'    Delay_ms(1000);                      // one second delay
+'
+'    number++ ;                           // increment number
+'    if (number > 9999u)
+'      number = 0;
+'
+'  }
+
+end.

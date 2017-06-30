@@ -1,0 +1,261 @@
+module Alarm_clock
+const _THRESHOLD = 240 external'240' 1000ms / 4 ms for every times overflow
+dim counter as byte   external
+
+dim counter1,second_alarm_clock as byte external
+    minutes_alarm_clock,hours_alarm_clock  as byte external
+'dim OCR2_ as hex
+
+dim Start_hours, Start_minutes, Start_seconds, Start_day, Start_week, Start_month, Start_year as byte  external    ' Global date/time variables
+dim  Start_minutes_next, Start_seconds_next as integer
+       End_minutes_next, End_seconds_next as byte    ' Global date/time variables
+dim target_hr,target_min,target_sec as byte  external
+sub procedure timer2_init()
+sub procedure timer1_init()
+sub procedure DS1307(dim hours, minutes, seconds as byte)
+sub procedure reset_alarm_clock()
+sub procedure timer_setting(dim up_down as byte)
+
+implements
+
+sub procedure Key_Port_Init()
+    #IFDEF ATmega32a
+      ''################PWM Ports #############
+       DDB1_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB2_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB3_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB6_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB7_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+      ''################timer test part #############
+    #ENDIF
+end sub
+ '**************************************************************************************************
+'* Call Shamsi
+'**************************************************************************************************}
+'sub procedure timer1_init()
+''  // Timer/Counter 0 initialization
+''  // Clock source: System Clock
+''  // Clock value: 7.813 kHz
+''  // Mode: Normal top=0xFF
+''  // OC0 output: Disconnected
+'  TCCR0=0x04
+'  TCNT0=0x06
+'  OCR0=0x00
+''  // Timer(s)/Counter(s) Interrupt(s) initialization
+'  TIMSK=0x01
+''  // Global enable interrupts
+''  #asm("sei")
+'   SREG_I_bit = 1                                   '' // Enable Interrupts
+'   Delay_ms(100)
+'   PORTD6_bit=not PORTD6_bit      ' toggle PORTD6_bit
+'   second_alarm_clock=0 minutes_alarm_clock=0  hours_alarm_clock=0
+'end sub
+  sub procedure timer1_init()
+    counter1=0
+    DDB7_BIT=1 PORTB7_bit=not PORTB7_bit      ' toggle PORTD6_bit
+    second_alarm_clock=0 minutes_alarm_clock=0 hours_alarm_clock=0
+    Start_seconds=0 Start_minutes=0 Start_hours=0
+'    target_sec=0 target_min=0 target_hr=0
+    SREG_I_bit = 1             ' Interrupt enable
+    TOIE1_bit  = 1             ' Timer1 overflow interrupt enable
+    TCCR1B = 2                 ' Start timer with 8 prescaler
+  end sub
+sub procedure timer2_init()
+  '// Timer/Counter 2 initialization
+  '// Clock source: System Clock
+  '// Clock value: 15.625 kHz
+  '// Mode: CTC top=OCR2
+  '// OC2 output: Disconnected
+'  clk = Clock_MHz()
+'  OCR2_=62.5*4ms-1=249   TCNT2=256-249=7
+
+  ASSR=0x00
+  TCCR2=0x04
+  TCNT2=0x06
+'  OCR2=0x11
+  TOIE2_bit  = 1             ' Timer1 overflow interrupt enable
+
+  '// Timer(s)/Counter(s) Interrupt(s) initialization
+  TIMSK=0x80
+'  // Global enable interrupts
+'  #asm("sei")
+   SREG_I_bit = 1                                   '' // Enable Interrupts
+   TOIE2_bit = 1                                   ''// Timer2 overflow interrupt enable
+   Delay_ms(100)
+   DDB7_BIT=1 PORTB7_bit=not PORTB7_bit      ' toggle PORTD6_bit
+   second_alarm_clock=5 minutes_alarm_clock=0 hours_alarm_clock=0
+   Start_seconds=0 Start_minutes=0 Start_hours=0
+'   target_sec=0 target_min=0 target_hr=0
+
+
+  
+end   sub
+
+
+
+'sub procedure Timer2Overflow_ISR iv IVT_ADDR_TIMER2_OVF
+''  // Reinitialize Timer 0 value
+'   TCNT2=0x06
+' if (counter1 >= _THRESHOLD) then
+'    PORTD7_bit=not PORTD7_bit      ' toggle PORTD7_bit
+'    PORTD6_bit=not PORTD6_bit      ' toggle PORTD6_bit
+'    counter1 = 0              ' reset counter
+'    else
+'      Inc(counter1)           ' increment counter
+'  end if
+'
+'end sub
+'sub procedure Timer2Overflow_ISR iv IVT_ADDR_TIMER2_OVF
+'  if (counter >= _THRESHOLD) then
+'    PORTB = not PORTB        ' toggle PORTB
+'    counter = 0              ' reset counter
+'    else
+'      Inc(counter)           ' increment counter
+'  end if
+'end sub
+sub procedure Timer2Overflow_ISR iv IVT_ADDR_TIMER2_OVF
+'  // Reinitialize Timer 0 value
+   TCNT2=0x06
+' if (counter1 >= _THRESHOLD) then
+ if (counter1 >= _THRESHOLD) then
+    counter1 = 0              ' reset counter
+    inc(second_alarm_clock)
+    if  second_alarm_clock>59 then
+        second_alarm_clock=0   inc(minutes_alarm_clock) ' reset  second_alarm_clock
+    end if
+    if minutes_alarm_clock>59 then
+       minutes_alarm_clock=0 inc(hours_alarm_clock)
+    end if
+    if hours_alarm_clock>23 then
+       hours_alarm_clock=0
+    end if
+'    PORTD7_bit=not PORTD7_bit      ' toggle PORTD7_bit
+'    PORTD6_bit=not PORTD6_bit      ' toggle PORTD6_bit
+    else
+      Inc(counter1)           ' increment counter
+
+  end if
+  PORTB7_bit=not PORTB7_bit      ' toggle PORTD6_bit
+'  DELAY_MS(10)
+end sub
+
+
+ sub procedure Timer1Overflow_ISR iv IVT_ADDR_TIMER1_OVF
+'  // Reinitialize Timer 0 value
+   TCNT1L=0x06
+' TCNT1L=0x00
+ if (counter1 >= _THRESHOLD) then
+                 ' reset counter
+    inc(second_alarm_clock)
+    if  second_alarm_clock>59 then
+        second_alarm_clock=0   inc(minutes_alarm_clock) ' reset  second_alarm_clock
+    end if
+    if minutes_alarm_clock>59 then
+       minutes_alarm_clock=0 inc(hours_alarm_clock)
+    end if
+    if hours_alarm_clock>23 then
+       hours_alarm_clock=0
+    end if
+    counter1 = 0
+'    PORTD7_bit=not PORTD7_bit      ' toggle PORTD7_bit
+'    PORTD6_bit=not PORTD6_bit      ' toggle PORTD6_bit
+    else
+      Inc(counter1)           ' increment counter
+
+  end if
+  PORTB7_bit=not PORTB7_bit      ' toggle PORTD6_bit
+'  DELAY_MS(100)
+end sub
+sub procedure reset_alarm_clock()
+ second_alarm_clock=0 minutes_alarm_clock=0 hours_alarm_clock=0
+end sub
+
+
+sub procedure timer_setting(dim up_down as byte)
+   if up_down=1 then             ' up_down=1 means up
+'    inc(second_alarm_clock)
+
+     inc(target_sec)
+     if  target_sec>59 then
+         target_sec=0   inc(target_min) ' reset  second_alarm_clock
+     end if
+     if target_min>59 then
+        target_min=0 inc(target_hr)
+     end if
+     if target_hr>23 then
+        target_hr=0
+     end if
+'    PORTD7_bit=not PORTD7_bit      ' toggle PORTD7_bit
+'    PORTD6_bit=not PORTD6_bit      ' toggle PORTD6_bit
+  else
+     dec(target_sec)
+     if  target_sec>59 then
+         target_sec=59  dec(target_min) ' reset  second_alarm_clock
+     end if
+     if target_min>59 then
+        target_min=59 dec(target_hr)
+     end if
+     if target_hr>23 then
+        target_hr=23
+     end if
+
+  end if
+  end sub
+sub procedure DS1307(dim hours, minutes, seconds as byte)
+                      ''', dim hours_first,minutes_first,seconds_first as byte)
+                           '' ,dim target_hr,target_min,target_sec as byte)
+'    dim sec_t,min_t,hr_t as byte
+'    sec_t=0 min_t=0 hr_t=0
+'    lcd_0() bytetostr(Start_seconds,TXT) Lcd_out(1, 1, "St_s:"+ txt) BYTETOSTR(seconds,TXT ) Lcd_out(1, 11, "s:"+ txt)
+'    BYTETOSTR(Start_minutes,TXT) Lcd_out(2, 1, "St_m"+ txt) BYTETOSTR(minutes,TXT) Lcd_out(2, 11, "m:"+ txt) delay_ms(200)
+
+    if seconds>=Start_seconds+1 or ((seconds=0) and (Start_seconds=59))  then
+       target_sec=target_sec+1   Start_seconds=seconds
+    else if seconds<>Start_seconds  then
+          Start_seconds=seconds
+         end if
+    end if
+    if minutes>=Start_minutes+1 or ((minutes=0) and (Start_minutes=59))  then
+          Start_minutes=minutes
+'          target_min=target_min+1
+    else if minutes<>Start_minutes  then
+          Start_minutes=minutes
+         end if
+    end if
+'   lcd_0() bytetostr(Start_seconds,TXT) Lcd_out(1, 1, "St_s:"+ txt) BYTETOSTR(seconds,TXT ) Lcd_out(1, 9, "s:"+ txt)
+'    BYTETOSTR(Start_minutes,TXT) Lcd_out(2, 1, "St_m"+ txt) BYTETOSTR(minutes,TXT) Lcd_out(2, 9, "m:"+ txt) delay_ms(200)
+
+    'if minutes=Start_minutes+1  or ((minutes=0) and (Start_minutes=59)) then
+'       target_min=target_min+1   Start_minutes=minutes
+'    end if
+'    if hours=Start_hours+1 or ((hours=0) and (Start_hours=23)) then
+'       target_hr=target_hr+1     Start_hours= hours
+'    end if
+    if target_sec>=60 then
+               target_sec=0         target_min=target_min+1
+    end if
+    if target_min>=60 then
+           target_min=0  target_sec=0       target_hr=target_hr+1
+    end if
+    if target_hr>=24 then
+       target_hr=0 target_min=0 target_sec=0
+    end if
+
+    'if target_hr=24 then
+'       target_hr=0 target_min=0 target_sec=0
+'    else
+'        if target_min=60 then
+'           target_min=0  target_sec=0       ''target_hr=target_hr+1
+'        else
+'            if target_sec=60 then
+'               target_sec=0         ''target_min=target_min+1
+'            end if
+'        end if
+'    end if
+'
+
+end sub
+
+
+
+end.

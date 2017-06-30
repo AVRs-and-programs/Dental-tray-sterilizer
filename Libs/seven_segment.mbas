@@ -1,0 +1,405 @@
+module seven_segment
+const CharTable as byte[51]=(
+    0x80, ' "-"
+    0x01, ' "."   Sevensegment bit order
+    0x00, ' "/"   (g)(f)(e)(d)(c)(a)(b)(dp)
+    0x7E, ' "0"
+    0x0A, ' "1"    _a_
+    0xB6, ' "2"  f|   |b
+    0x9E, ' "3"   |_g_|
+    0xCA, ' "4"  e|   |c
+    0xDC, ' "5"   |_d_|.dp
+    0xFC, ' "6"
+    0x0E, ' "7"
+    0xFE, ' "8"
+    0xDE, ' "9"
+    0x00, ' ":"
+    0x00, ' ""
+    0x00, ' "<"
+    0x00, ' "="
+    0x00, ' ">"
+    0x00, ' "?"
+    0x00, ' "@"
+    0xEE, ' "A"
+    0xF8, ' "B"
+    0x74, ' "C"
+    0xBA, ' "D"
+    0xF4, ' "E"
+    0xE4, ' "F"
+    0x7C, ' "G"
+    0xEA, ' "H"
+    0x0A, ' "I"
+    0x3A, ' "J"
+    0x00, ' "K"
+    0x70, ' "L"
+    0x00, ' "M"
+    0x6E, ' "N"
+    0x00, ' "O"
+    0xE6, ' "P"
+    0xCE, ' "Q"
+    0x64, ' "R"
+    0xDC, ' "S"
+    0xF0, ' "T"
+    0x7A, ' "U"
+    0x00, ' "V"
+    0x00, ' "W"
+    0x00, ' "X"
+    0xDA, ' "Y"
+    0x00, ' "Z"
+    0x00, ' "["
+    0x00, ' "/"
+    0x00, ' "]"
+    0x00, ' "^"
+    0x10  ' "_"
+)
+
+' Keypad module connections
+dim keypadPort_D as byte at PORTD
+dim keypadPort_Direction_D as byte at   DDRD
+
+dim keypadPort_C as byte at PORTC
+dim keypadPort_Direction_C as byte at   DDRC
+' End Keypad module connections
+dim istr0 as char
+dim istr as string[1]
+dim n   as integer external
+dim k as integer
+
+Sub Procedure Display_Number(Dim dNumber as integer)
+Sub Procedure Display_Init()
+Sub Procedure Display_InterruptCall()
+
+Sub Procedure Display_text(dim byref ms2 as string[3])
+Sub Procedure Display_Number_2(Dim dNumber as integer,dim byref ms2 as string[3])
+'sub procedure Lcd_0()
+implements
+
+dim zz, v       as byte
+dim Display      as byte[4]
+dim v2 as byte
+
+sub procedure Lcd_0()
+
+END SUB
+Sub Procedure Display_Init()
+
+'   TRISA = %00000000
+   keypadPort_D = 0
+   keypadPort_Direction_D = 0xFF    ' set PORTD as output
+
+'   TRISD = %00000000
+   keypadPort_Direction_C=0xFF   ' set PORTC as output
+   keypadPort_C = 0
+'   DDC3_bit=1 PORTC3_bit=1
+
+       '                  .gfedcba
+       'portD=            %00111111
+'       portc=            %00000111       ' 1 th
+'       delay_ms(100)
+'
+'       portc=            %00001011        '' 10th
+'       portD=            %00000110
+'       delay_ms(100)
+'       portc=            %00001101         ' 100th
+'       portD=            %11011011
+'       delay_ms(100)
+'       portc=            %00001110         ' 1000 th
+'       portD=            %01101111
+'       delay_ms(100)
+'    delay_ms(2000)
+     v          = 0  v2=0
+     zz         = 1
+
+     Display[3]     = 0      ' mask for digit 4 (7seg.)
+     Display[2]     = 0      ' mask for digit 6 (7seg.)
+     Display[1]     = 0      ' mask for digit 5 (7seg.)
+     Display[0]     = 0      ' mask for digit 8 (7seg.)
+
+End Sub
+
+Sub Procedure Display_InterruptCall()
+     delay_ms(10)
+'     keypadPort_D = Display[v]           ' Send the appropriate mask to PORTB
+'     keypadPort_C = zz                  ' Turn on appropriate 7seg. display
+     
+     'Select case zz
+'       case 1
+'       PORTC0_bit=1
+'       case 2
+'       PORTC1_bit=1
+'       case 3
+'       PORTC2_bit=1
+'       case 4
+'       PORTC3_bit=1
+'     End Select
+'     PORTC3_bit=1
+     
+
+
+'     keypadPort_D = Display[v]           ' Send the appropriate mask to PORTB
+'     keypadPort_C = zz                  ' Turn on appropriate 7seg. display
+'     Inc(v)
+'     zz = zz << 1                ' Prepare for next digit
+'     if zz > 8 then
+'       zz = 1
+'     end if
+     if v > 3 then
+       v = 0
+     end if
+
+
+   inc(v2)
+    if ((n div 10000)=0) then
+       if v2 > 3 then
+           v2 = 0
+       end if
+   end if
+   
+    if ((n div 1000)=0) then
+       if v2 > 2 then
+           v2 = 0
+       end if
+   end if
+   if (n div 100)=0 then
+     if v2 > 1 then
+         v2 = 0
+     end if
+   end if
+   if (n div 10)=0 then
+     if v2 > 0 then
+         v2 = 0
+     end if
+   end if
+
+
+   Select case  v2
+   case 0  portc=            %00000111       ' 1 th
+   case 1  portc=            %00001011        '' 10th
+   case 2  portc=            %00001101         ' 100th
+   case 3  portc=            %00001110         ' 1000 th
+   end select
+   keypadPort_D = Display[v2]           ' Send the appropriate mask to PORTB
+   
+
+   if v2 > 3 then
+       v2 = 0
+   end if
+     'Select case zz
+'       case 1
+'       PORTC0_bit=1
+'       case 2
+'       PORTC1_bit=1
+'       case 3
+'       PORTC2_bit=1
+'       case 4
+'       PORTC3_bit=1
+'     End Select
+     
+End Sub
+
+
+
+Sub Function StringToD_seven(dim tirth as byte) as word
+
+    Result = 0
+'   Display_InterruptCall()
+   if tirth<>1 then
+       Select case istr[0]
+          '                  .gfedcba
+          case "0" Result = %00111111
+          case "1" Result = %00000110
+          case "2" Result = %01011011
+          case "3" Result = %01001111
+          case "4" Result = %01100110
+          case "5" Result = %01101101
+          case "6" Result = %01111101
+          case "7" Result = %00000111
+          case "8" Result = %01111111
+          case "9" Result = %01101111
+          case "E" Result = %01111001
+'          case "N" Result = 0x6E
+'          case "D" Result = 0xBA
+          case "N" Result = %00110111
+          case "D" Result = %01011110
+          case "G" Result = %01111101
+          case "O" Result = %00111111
+          case "r" Result = %00110001
+          case "e" Result = %01111011
+          case "d" Result = %01011110
+          case "y" Result = %01101110
+          case "s" Result = %01101101
+          case "a" Result = %01110111
+          case "v" Result = %00111110
+          case " " Result = %00000000
+       End Select
+   else
+       Select case istr[0]
+          '                  .gfedcba
+          case "0" Result = %10111111
+          case "1" Result = %10000110
+          case "2" Result = %11011011
+          case "3" Result = %11001111
+          case "4" Result = %11100110
+          case "5" Result = %11101101
+          case "6" Result = %11111101
+          case "7" Result = %10000111
+          case "8" Result = %11111111
+          case "9" Result = %11101111
+          case "E" Result = %11111001
+          case "N" Result = %10110111
+          case "D" Result = %11011110
+       End Select
+   end if
+End Sub
+
+
+Sub Procedure Display_InterruptCall_text(dim V2_2 as byte )
+     delay_ms(10)
+     v2=V2_2
+'     keypadPort_D = Display[v]           ' Send the appropriate mask to PORTB
+'     keypadPort_C = zz                  ' Turn on appropriate 7seg. display
+
+     'Select case zz
+'       case 1
+'       PORTC0_bit=1
+'       case 2
+'       PORTC1_bit=1
+'       case 3
+'       PORTC2_bit=1
+'       case 4
+'       PORTC3_bit=1
+'     End Select
+'     PORTC3_bit=1
+
+
+
+'     keypadPort_D = Display[v]           ' Send the appropriate mask to PORTB
+'     keypadPort_C = zz                  ' Turn on appropriate 7seg. display
+'     Inc(v)
+'     zz = zz << 1                ' Prepare for next digit
+'     if zz > 8 then
+'       zz = 1
+'     end if
+
+
+
+   Select case  v2
+   case 0  portc=            %00000111       ' 1 th
+   case 1  portc=            %00001011        '' 10th
+   case 2  portc=            %00001101         ' 100th
+   case 3  portc=            %00001110         ' 1000 th
+   end select
+    keypadPort_D = Display[v2]           ' Send the appropriate mask to PORTB
+
+
+
+
+End Sub
+
+
+sub function GetChar(dim Character as char) as byte
+  if ((Character >= "-") AND (Character <= "_")) then
+    result = CharTable[Character-"-"]
+  else
+    result = 0
+    end if
+end sub
+Sub Procedure Display_Number(Dim dNumber as integer)
+
+   Dim ms   as string[6]
+
+   if dNumber > 9999 then
+      dNumber = 9999
+   end if
+   n=dNumber
+   
+   IntToStr(dNumber,ms)
+
+   istr[0]=ms[5]   Display[0] = StringToD_seven(0) Display_InterruptCall()
+   istr[0]=ms[4]   Display[1] = StringToD_seven(0) Display_InterruptCall()
+   istr[0]=ms[3]   Display[2] = StringToD_seven(1) Display_InterruptCall()
+   istr[0]=ms[2]   Display[3] = StringToD_seven(0) Display_InterruptCall()
+'   Display[1] = StringToD_seven(ms[4])
+'   Display[2] = StringToD_seven(ms[3])
+'   Display[3] = StringToD_seven(ms[2])
+    '
+'   Display[0] = StringToD_seven(ms[5])
+'   Display[1] = StringToD_seven(ms[4])
+'   Display[2] = StringToD_seven(ms[3])
+'   Display[3] = StringToD_seven(ms[2])
+
+End Sub
+Sub Procedure Display_Number_2(Dim dNumber as integer,dim byref ms2 as string[3])
+   Dim ms   as string[6]
+   if strcmp(ms2,"int")=0 then
+   
+
+
+     if dNumber > 9999 then
+        dNumber = 9999
+     end if
+     n=dNumber
+
+     inttostr(dNumber,ms)
+    if strcmp(ms,"    ")=0  then
+
+'     istr[0]=ms[5]   Display[0] = StringToD_seven(0) Display_InterruptCall()
+'     istr[0]=ms[4]   Display[1] = StringToD_seven(0) Display_InterruptCall()
+'     istr[0]=ms[3]   Display[2] = StringToD_seven(1) Display_InterruptCall()
+     istr[0]=ms[2]   Display[3] = StringToD_seven(0) Display_InterruptCall()
+
+    else
+     for k=1 to  10
+       istr[0]=ms[5]   Display[0] = StringToD_seven(0) Display_InterruptCall()
+       istr[0]=ms[4]   Display[1] = StringToD_seven(0) Display_InterruptCall()
+       istr[0]=ms[3]   Display[2] = StringToD_seven(1) Display_InterruptCall()
+       istr[0]=ms[2]   Display[3] = StringToD_seven(0) Display_InterruptCall()
+      next k
+    end if
+   else
+      for k=1 to  10
+      istr[0]=ms2[3]   Display[0] = StringToD_seven(0) Display_InterruptCall_text(0)
+      istr[0]=ms2[2]   Display[1] = StringToD_seven(0) Display_InterruptCall_text(1)
+      istr[0]=ms2[1]   Display[2] = StringToD_seven(0)  Display_InterruptCall_text(2)
+      istr[0]=ms2[0]   Display[3] = StringToD_seven(0) Display_InterruptCall_text(3)
+      next k
+   end if
+
+End Sub
+
+Sub Procedure Display_text(dim byref ms2 as string[3])
+
+    'dim st as string[4]
+'    wordtostr(ms,st)
+'
+'   istr[0]=st[0]   Display[0] = StringToD_seven(0)
+'   istr[0]=st[1]   Display[1] = StringToD_seven(0)
+'   istr[0]=st[2]   Display[2] = StringToD_seven(1)
+'   istr[0]=st[3]   Display[3] = StringToD_seven(0)
+   
+    for k=1 to  10
+   istr[0]=ms2[3]   Display[0] = StringToD_seven(0) Display_InterruptCall_text(0)
+   istr[0]=ms2[2]   Display[1] = StringToD_seven(0) Display_InterruptCall_text(1)
+   istr[0]=ms2[1]   Display[2] = StringToD_seven(0)  Display_InterruptCall_text(2)
+   istr[0]=ms2[0]   Display[3] = StringToD_seven(0) Display_InterruptCall_text(3)
+    next k
+'   Display[2] =GetChar(ms2[3])
+'    Display_InterruptCall()
+'   Display[1] = StringToD_seven(ms[4])
+'   Display[2] = StringToD_seven(ms[3])
+'   Display[3] = StringToD_seven(ms[2])
+    '
+'   Display[0] = StringToD_seven(ms[5])
+'   Display[1] = StringToD_seven(ms[4])
+'   Display[2] = StringToD_seven(ms[3])
+'   Display[3] = StringToD_seven(ms[2])
+
+End Sub
+
+'
+'
+'end.module |
+'
+'implements
+
+end.

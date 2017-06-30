@@ -1,0 +1,96 @@
+module Segment
+
+' Keypad module connections
+dim keypadPort_D as byte at PORTD
+dim keypadPort_Direction_D as byte at   DDRD
+
+dim keypadPort_C as byte at PORTC
+dim keypadPort_Direction_C as byte at   DDRC
+' End Keypad module connections
+
+
+Sub Procedure Display_Number(Dim dNumber as integer)
+Sub Procedure Display_Init()
+Sub Procedure Display_InterruptCall()
+
+implements
+
+dim zz, v       as byte
+dim Display      as byte[4]
+
+
+Sub Procedure Display_Init()
+
+'   TRISA = %00000000
+   keypadPort_D = 0
+   keypadPort_Direction_D = 1
+   
+'   TRISD = %00000000
+   keypadPort_Direction_C=1
+   keypadPort_C = 0
+
+     v          = 0
+     zz         = 1
+
+     Display[3]     = 0      ' mask for digit 4 (7seg.)
+     Display[2]     = 0      ' mask for digit 6 (7seg.)
+     Display[1]     = 0      ' mask for digit 5 (7seg.)
+     Display[0]     = 0      ' mask for digit 8 (7seg.)
+
+End Sub
+
+Sub Procedure Display_InterruptCall()
+
+     keypadPort_Direction_D = Display[v]           ' Send the appropriate mask to PORTB
+     keypadPort_C = zz                  ' Turn on appropriate 7seg. display
+     Inc(v)
+     zz = zz << 1                ' Prepare for next digit
+     if zz > 8 then
+       zz = 1
+     end if
+     if v > 3 then
+       v = 0
+     end if
+
+End Sub
+
+
+
+Sub Function StringToD7(Dim istr as string) as word
+
+   Result = 0
+   Select case istr
+      '                  .gfedcba
+      case "0" Result = %00111111
+      case "1" Result = %00000110
+      case "2" Result = %01011011
+      case "3" Result = %01001111
+      case "4" Result = %01100110
+      case "5" Result = %01101101
+      case "6" Result = %01111101
+      case "7" Result = %00000111
+      case "8" Result = %01111111
+      case "9" Result = %01101111
+   End Select
+   Display_InterruptCall()
+
+End Sub
+
+Sub Procedure Display_Number(Dim dNumber as integer)
+
+   Dim ms   as string[6]
+
+   if dNumber > 9999 then
+      dNumber = 9999
+   end if
+
+   inttostr(dNumber,ms)
+
+   Display[0] = StringToD7(ms[5])
+   Display[1] = StringToD7(ms[4])
+   Display[2] = StringToD7(ms[3])
+   Display[3] = StringToD7(ms[2])
+
+End Sub
+
+end.

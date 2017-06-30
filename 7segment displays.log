@@ -1,0 +1,14 @@
+0	1	mBAVR.exe -DBG -pATMEGA8 -MSF -Y -DL -SSA -O11111114 -fo8 -BOOTSZ1024 -BOOTOP0 -N"C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\7segment displays.mbpav" -SP"E:\Program Files (x86)\mikroBasic PRO for AVR2\defs\" -SP"E:\Program Files (x86)\mikroBasic PRO for AVR2\uses\lte64kw\" -SP"C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\" -SP"C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2\" -SP"C:\Users\Hamed\IGC\Desktop\tray 1 - Copy\" "__Lib_Math.mcl" "__Lib_MathDouble.mcl" "__Lib_System.mcl" "__Lib_Delays.mcl" "__Lib_String.mcl" "__Lib_Conversions.mcl" "__Lib_Time.mcl" "__Lib_Trigon.mcl" "__Lib_Trigonometry.mcl" "__Lib_Button.mcl" "__Lib_EEPROM_eew.mcl" "__Lib_PWM1_2_presc.mcl" "__Lib_PWM16bit_12.mcl" "7segment displays.mbas"	 
+warning: 0	1501	Specified search path does not exist: 'C:\Users\Hamed\IGC\Desktop\tray 1 - Copy'	 
+diagnostics: 0	133	Compilation Started	C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\7segment displays.mbas
+hint: 1	1015	Hint: Compiling unit "C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\7segment displays.mbas"	7segment displays.mbas
+hint: 291	1010	Hint: Unit "7segment displays.mbas" has been recompiled	7segment displays.mbas
+diagnostics: 0	134	Compiled Successfully	C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\7segment displays.mbas
+diagnostics: 0	139	All files Compiled in 93 ms	 
+hint: 0	1144	Used RX (bytes): 32 (100%)   Free RX (bytes): 0 (0%)	Used RX (bytes): 32 (100%)   Free RX (bytes): 0 (0%)
+hint: 0	1144	Static RAM (bytes): 45   Dynamic RAM (bytes): 978	Static RAM (bytes): 45   Dynamic RAM (bytes): 978
+hint: 0	1144	Used ROM (bytes): 5496 (89%)  Free ROM (bytes): 648 (11%)	Used ROM (bytes): 5496 (89%)  Free ROM (bytes): 648 (11%)
+diagnostics: 0	145	Project Linked Successfully	7segment displays.mbpav
+diagnostics: 0	140	Linked in 63 ms	 
+diagnostics: 0	141	Project '7segment displays.mbpav' completed: 187 ms	 
+diagnostics: 0	103	Finished successfully: 30 ŽæÆä 2017, 11:44:28	7segment displays.mbpav

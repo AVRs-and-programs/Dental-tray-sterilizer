@@ -1,0 +1,149 @@
+module LCD
+
+'#IFDEF ATmega32
+'  symbol LCD_RS_my = PORTc2_bit
+'  symbol LCD_EN_my =PORTc3_bit
+'  symbol LCD_D4_my =PORTc4_bit
+'  symbol LCD_D5_my=PORTc5_bit
+'  symbol LCD_D6_my =PORTc6_bit
+'  symbol LCD_D7_my=PORTc7_bit
+'
+'  symbol LCD_RS_Direction_my = DDc2_bit
+'  symbol LCD_EN_Direction_my =DDc3_bit
+'  symbol LCD_D4_Direction_my =DDc4_bit
+'  symbol LCD_D5_Direction_my=DDc5_bit
+'  symbol LCD_D6_Direction_my =DDc6_bit
+'  symbol LCD_D7_Direction_my=DDc7_bit
+'#ENDIF
+
+#IFDEF ATmega32a
+  symbol LCD_RS_my = PORTc7_bit
+  symbol LCD_EN_my =PORTc6_bit
+  symbol LCD_D4_my =PORTc2_bit
+  symbol LCD_D5_my=PORTc3_bit
+  symbol LCD_D6_my =PORTc4_bit
+  symbol LCD_D7_my=PORTc5_bit
+
+  symbol LCD_RS_Direction_my = DDc7_bit
+  symbol LCD_EN_Direction_my =DDc6_bit
+  symbol LCD_D4_Direction_my =DDc2_bit
+  symbol LCD_D5_Direction_my=DDc3_bit
+  symbol LCD_D6_Direction_my =DDc4_bit
+  symbol LCD_D7_Direction_my=DDc5_bit
+#ENDIF
+'
+#IFDEF ATmega8
+  symbol LCD_RS_my = PORTB0_bit
+  symbol LCD_EN_my =PORTC6_bit
+  symbol LCD_D4_my =PORTB4_bit
+  symbol LCD_D5_my=PORTB5_bit
+  symbol LCD_D6_my =PORTB6_bit
+  symbol LCD_D7_my=PORTB7_bit
+
+  symbol LCD_RS_Direction_my = DDB0_bit
+  symbol LCD_EN_Direction_my =DDC6_bit
+  symbol LCD_D4_Direction_my =DDB4_bit
+  symbol LCD_D5_Direction_my=DDB5_bit
+  symbol LCD_D6_Direction_my =DDB6_bit
+  symbol LCD_D7_Direction_my=DDB7_bit
+#ENDIF
+' Lcd module connections
+dim LCD_RS as sbit at LCD_RS_my
+dim LCD_EN as sbit at LCD_EN_my
+dim LCD_D4 as sbit at LCD_D4_my
+dim LCD_D5 as sbit at LCD_D5_my
+dim LCD_D6 as sbit at LCD_D6_my
+dim LCD_D7 as sbit at LCD_D7_my
+
+dim LCD_RS_Direction as sbit at LCD_RS_Direction_my
+dim LCD_EN_Direction as sbit at LCD_EN_Direction_my
+dim LCD_D4_Direction as sbit at LCD_D4_Direction_my
+dim LCD_D5_Direction as sbit at LCD_D5_Direction_my
+dim LCD_D6_Direction as sbit at LCD_D6_Direction_my
+dim LCD_D7_Direction as sbit at LCD_D7_Direction_my
+
+''################# LCD Farsi character #################
+    const character as byte[8] = (1,14,20,4,4,4,4,0)
+    const heart as byte[8] = (0,10,21,17,10,4,0,0)
+    const co as byte[8] = (0,0,0,15,9,9,15,0)       ' Custom letter O
+    const cn as byte[8] = (0,0,0,9,13,11,9,0)       ' Custom letter N
+    const cf as byte[8] = (0,0,0,15,8,14,8,0)       ' Custom letter F
+    const character_b as byte[8] = (0,0,17,17,31,0,4,0)
+
+sub procedure Lcd_0()
+'sub procedure LCD_Load()
+'sub procedure CustomChar(dim pos_row as byte, dim pos_char as byte)
+sub procedure Lcd_Port_Init()
+implements
+''################# LCD Initial #################
+sub procedure Lcd_Port_Init()
+    #IFDEF ATmega128
+     ''################LCD Ports #############
+      DDC2_bit =1   DDC3_bit =1
+      DDC4_bit =1   DDC5_bit =1  ' configure PORTD as output
+      DDC6_bit =1   DDC7_bit =1
+     ''################LCD Ports #############
+    #ENDIF
+    #IFDEF ATmega32
+     ''################LCD Ports #############
+      DDC2_bit =1   DDC3_bit =1
+      DDC4_bit =1   DDC5_bit =1  ' configure PORTD as output
+      DDC6_bit =1   DDC7_bit =1
+     ''################LCD Ports #############
+    #ENDIF
+    #IFDEF ATmega32a
+     ''################LCD Ports #############
+      DDC2_bit =1   DDC3_bit =1
+      DDC4_bit =1   DDC5_bit =1  ' configure PORTD as output
+      DDC6_bit =1   DDC7_bit =1
+     ''################LCD Ports #############
+    #ENDIF
+    #IFDEF ATmega32
+     ''################LCD Ports #############
+      DDC6_bit =1   DDB1_bit =1
+      DDB4_bit =1   DDB5_bit =1  ' configure PORTD as output
+      DDB6_bit =1   DDB7_bit =1
+     ''################LCD Ports #############
+    #ENDIF
+ end sub
+sub procedure Lcd_0()
+              Lcd_Init()
+              Lcd_Cmd(_LCD_CLEAR)               ' Clear display
+              Lcd_Cmd(_LCD_CURSOR_OFF)          ' Cursor off
+
+end sub
+
+
+sub procedure LCD_Load()
+       dim i, dchar as byte
+       for dchar = 0 to 4
+          LCD_Cmd(64 + (dchar * 8))               ' Select 2x16 memory location for custom character
+          for i = 0 to 7
+            select case dchar                     ' Select custom character array
+               case 0
+                  LCD_Chr_Cp(heart[i])
+               case 1
+                  LCD_Chr_Cp(co[i])
+               case 2
+                  LCD_Chr_Cp(cn[i])
+               case 3
+                  LCD_Chr_Cp(cf[i])
+               case 4
+                  LCD_Chr_Cp(character_b[i])
+            end select
+          next i
+       next dchar
+    end sub
+
+sub procedure CustomChar(dim pos_row as byte, dim pos_char as byte)
+  dim i as byte
+    Lcd_Cmd(120)
+    for i = 0 to 7
+      Lcd_Chr_CP(character[i])
+    next i
+    Lcd_Cmd(_LCD_RETURN_HOME)
+    Lcd_Chr(pos_row, pos_char, 7)
+end sub
+
+
+end.

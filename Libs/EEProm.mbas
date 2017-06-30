@@ -1,0 +1,56 @@
+module EEProm
+dim Mot_On_mSec as Byte[5] external
+'dim counter_save as byte
+dim target_hr,target_min,target_sec,target_interval,target_pwm,target_enable as byte external
+sub procedure eeprom_call_back()
+sub procedure eeprom_save()
+sub procedure int_eeprom_ini()
+implements
+      ''################# EEPROM Initial #################
+
+sub procedure int_eeprom_ini()     ''internal eeprm of avr
+
+
+                     if  (EEPROM_Read(0x00)=12)   then
+                         eeprom_call_back()
+                    else
+                        EEPROM_Write(0x00 ,12 )
+
+                         target_enable=1  target_sec=18      target_min=0
+                         target_pwm =10    target_interval=4
+                         eeprom_save()
+'
+
+
+                    end if
+                     Delay_mS(1500)
+end sub
+''################# EEPROM Initial #################
+
+sub procedure eeprom_call_back()
+
+         Mot_On_mSec [0]=EEPROM_read(0x01 )
+         Mot_On_mSec [1]=EEPROM_read(0x02 )
+         Mot_On_mSec [2]=EEPROM_read(0x03 )
+         Mot_On_mSec [3]=EEPROM_read(0x04 )
+         Mot_On_mSec [4]=EEPROM_read(0x05 )
+
+         
+         target_enable=Mot_On_mSec[0]  target_sec=Mot_On_mSec[1]      target_min=Mot_On_mSec[2]
+         target_pwm =Mot_On_mSec[3]    target_interval=Mot_On_mSec[4]
+end sub
+
+
+ sub procedure eeprom_save()
+         Mot_On_mSec[0]=target_enable Mot_On_mSec[1]=target_sec  Mot_On_mSec[2]=target_min
+         Mot_On_mSec[3]=target_pwm    Mot_On_mSec[4]=target_interval
+
+         EEPROM_Write(0x01,Mot_On_mSec[0])
+         EEPROM_Write(0x02,Mot_On_mSec[1])
+         EEPROM_Write(0x03,Mot_On_mSec[2])
+         EEPROM_Write(0x04,Mot_On_mSec[3])
+         EEPROM_Write(0x05,Mot_On_mSec[4])
+
+
+end sub
+end.

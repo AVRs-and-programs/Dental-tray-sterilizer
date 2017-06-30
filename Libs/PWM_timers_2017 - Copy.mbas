@@ -1,0 +1,404 @@
+module PWM_timers_2017
+'dim on_a_0 as Byte[1][4][3][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]     4 end changed to 5 for adding second setting to on...
+'dim on_a_1 as Byte[7][4][7][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]     4 end changed to 5 for adding second setting to on...
+'dim on_a_1 as integer[7][4][7][2][4]  external ''[week-1][chanel-1][pwm_chanel-1][on_off2-1][0]
+'dim on_a_0 as byte[7][1][3][2][4]   external'' on_a_0 [week-1][chanel-1][pwm_chanel-1][on_off22-1][0]
+'  dim Mot_heater_On_mSec as  Byte[4][2][3][4]  external
+symbol Choice_number = 7
+dim txt as string[19]   external
+'###################timer #################
+Dim _ss as integer volatile data
+Dim _zz as word volatile data
+dim anz as string[10]
+dim freq as longword
+ztmp as integer
+korrekturfaktor as float
+_count as integer
+_a as integer
+dim Mot_heater_On_mSec as  Byte[Choice_number][2][3][4]  external  ''Mot_heater_On_mSec[chanel-1][Heater_motor_index-1][Pwm_chanel_main-1]
+
+ dim st as string[4]   external
+  dim output as integer external
+
+
+
+sub procedure PWM_MAKE(dim jj as byte,dim max_duty as byte,dim Pwm_chanel_make as byte)
+sub procedure  On_mSec_initial_Heater (dim en,mint,sec,prc as byte)'',dim prc as integer)
+sub procedure  On_mSec_initial_Motor (dim en,mint,sec,prc as byte)
+sub procedure Lcd_0() external
+'sub Function  strToInt1( dim byref  st1 as string[4]) as integer external
+sub procedure strToInt1()     external
+sub procedure PWM_Initialize ()
+sub procedure  WDT_on()
+sub procedure PWM_Port_Initialize ()
+implements
+
+
+
+'################# timer pwm ####################
+''    https://www.mikroe.com/forum/viewtopic.php?f=72&t=29914
+sub procedure SetPWM2(dim duty as integer)
+'   TCCR0|=(1<<WGM00)|(1<<WGM01)|(1<<COM01)|(1<<CS00)
+'   TCCR0 = (1<<FOC2)or (1<<COM21)or(1<<COM20) or(1<<WGM20) or (1<<CS00)
+'
+
+   OCR2=duty
+
+end sub
+
+sub procedure SetPWM1_A(dim duty as integer)
+'   TCCR0|=(1<<WGM00)|(1<<WGM01)|(1<<COM01)|(1<<CS00)
+'   TCCR0 = (1<<FOC2)or (1<<COM21)or(1<<COM20) or(1<<WGM20) or (1<<CS00)
+'
+   OCR1AH=0x00
+   OCR1AL=duty
+
+end sub
+sub procedure SetPWM1_B(dim duty as integer)
+'   TCCR0|=(1<<WGM00)|(1<<WGM01)|(1<<COM01)|(1<<CS00)
+'   TCCR0 = (1<<FOC2)or (1<<COM21)or(1<<COM20) or(1<<WGM20) or (1<<CS00)
+
+   OCR1BH=0x00
+   OCR1BL=duty
+end sub
+ sub procedure PWM_MAKE(dim jj as byte,dim max_duty as byte,dim Pwm_chanel_make as byte)
+'      dim st as string[4]
+      dim  ii as integer
+        jjyear as float
+'        jjyear=jj
+      jjyear=ceil((jj*max_duty)/100)
+      FloatToStr(jjyear, st)
+'      st[3]=(jjyear div 1000)  + 48
+'       st[2]=((jjyear mod 1000)div 100)  + 48
+'       st[1]= (((jjyear mod 1000)mod 100) div 10)  + 48
+'       st[0]= ((((jjyear mod 1000)mod 100) mod 10) div 1) + 48
+       Lcd_0()
+'         ii = StrToInt(st)
+'         strToInt1()
+'         ii =output
+          ii = integer (jjyear)
+         IntToStr(ii, txt)
+     Lcd_Out(1,1,st)
+     Lcd_Out(2,6,txt)
+     IntToStr(jj, txt)
+     Lcd_Out(2,1,txt)
+
+'     Delay_mS(100)
+     select case Pwm_chanel_make
+
+
+     case 2
+
+'          jj=ceil((jj*1024)/100)
+          PWM16bit_Change_Duty(ii,_TIMER1_CH_B )
+          PWM16bit_Change_Duty(ii,_TIMER1_CH_B )
+     case 1
+'     jj=floor((jj*1024)/100)
+'           PWM_MAKE_as_max(jj,1024) ii=output
+          PWM16bit_Change_Duty(ii,_TIMER1_CH_A )
+          PWM16bit_Change_Duty(ii,_TIMER1_CH_A )
+     'case 30  ''old
+''     PWM_MAKE_as_max(jj,512) ii=output
+''     jj=floor((jj*255)/100)
+'          if jj=0 then
+'             SetPWM0(max_duty)
+'           else
+'                if jj=max_duty  then
+'                   SetPWM0(0x00)
+'                else
+'                   SetPWM0(max_duty-ii)
+'                end if
+''                PWM1_Set_Duty(ii)
+'           end if
+'     case 3
+''     PWM_MAKE_as_max(jj,512) ii=output
+''     jj=floor((jj*255)/100)
+'           if jj=0 then
+'             SetPWM0(ii)
+'           else
+'                SetPWM0(ii)
+''                PWM1_Set_Duty(ii)
+'           end if
+     case 4
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+           'if jj=0 then
+'             SetPWM2(max_duty-ii)
+'           else
+'                SetPWM2(max_duty-ii)
+''                PWM1_Set_Duty(ii)
+'           end if
+           if jj=0 then
+             SetPWM2(0)
+           else
+                SetPWM2(ii)
+'                PWM1_Set_Duty(ii)
+           end if
+
+     case 45
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+'          PWM2_Set_Duty(ii)
+          PWM16bit_Change_Duty(ii,2 )
+'          PWM2_Set_Duty(j)''Set current duty for PWM2
+
+     case 25
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+          if jj=0 then
+             SetPWM1_A(max_duty-ii)
+           else
+                SetPWM1_A(max_duty-ii)
+'                PWM1_Set_Duty(ii)
+           end if
+     case 35
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+          if jj=0 then
+             SetPWM1_B(max_duty-ii)
+           else
+                SetPWM1_B(max_duty-ii)
+'                PWM1_Set_Duty(ii)
+           end if
+
+     case 5
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+'          PWM16bit_Change_Duty(ii, _TIMER3_CH_A )
+     case 6
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+'          PWM16bit_Change_Duty(ii, _TIMER3_CH_B )
+     case 7
+'     PWM_MAKE_as_max(jj,512) ii=output
+'     jj=floor((jj*255)/100)
+'          PWM16bit_Change_Duty(ii, _TIMER3_CH_C )
+     end select
+ end sub
+
+' ######################################################################################################################################
+sub procedure PWM_Port_Initialize ()
+    #IFDEF ATmega8
+      ''################PWM Ports #############
+       DDB1_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB2_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+       DDB3_bit = 1                    ' Set PORTB pin 3 as output pin for the PWM (according to datasheet)
+     ''################timer test part #############
+    #ENDIF
+
+end  sub
+' ######################################################################################################################################
+
+sub procedure PWM_Initialize ()
+dim j,k as byte
+'     as integer
+J=0
+
+
+'    PWM1_Init(_PWM1_FAST_MODE, _PWM1_PRESCALER_8, _PWM1_NON_INVERTED,J)
+'     TCCR0 = (1<<FOC2) or (1<<COM21) or (1<<COM20) or (1<<WGM20) or (1<<CS00) ''Pwm0 or pwm1 in meicrobasic
+    '' From mikroc pwm
+
+'    ########  changed for Atmega32 #########
+'    ASSR=0<<AS0
+'    ########  changed for Atmega32 #########
+
+'    TCCR0=(1<<WGM00) or (1<<COM01) or (1<<COM00) or (1<<WGM01) or (1<<CS02) or (0<<CS01) or (1<<CS00)
+'    TCNT0=0x00
+
+          '// Timer/Counter 1 initialization
+'          // Clock source: System Clock
+'          // Clock value: 7.813 kHz
+'          // Mode: Ph. correct PWM top=0x00FF
+'          // OC1A output: Non-Inv.
+'          // OC1B output: Non-Inv.
+'          // Noise Canceler: Off
+'          // Input Capture on Falling Edge
+'          // Timer1 Overflow Interrupt: Off
+'          // Input Capture Interrupt: Off
+'          // Compare A Match Interrupt: Off
+'          // Compare B Match Interrupt: Off
+'       '   TCCR1A=0xA1
+'          TCCR1B=0x05
+'          TCNT1H=0x00
+'          TCNT1L=0x00
+'          ICR1H=0x00
+'          ICR1L=0x00
+'          OCR1AH=0x00
+'          OCR1AL=0x11
+'          OCR1BH=0x00
+'          OCR1BL=0x12
+
+    '' From mikroc pwm
+'    PWM2_Init(_PWM2_FAST_MODE, _PWM2_PRESCALER_8, _PWM2_NON_INVERTED, J)
+'    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, j , _TIMER1)
+'    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, j , 2)
+'    PWM2_Init(_PWM2_PHASE_CORRECT_MODE, _PWM2_PRESCALER_8, _PWM2_NON_INVERTED, j)
+'    PWM1_Init(_PWM1_PHASE_CORRECT_MODE, _PWM1_PRESCALER_8, _PWM1_NON_INVERTED, j)
+'    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, j , _TIMER1)
+'    PWM_C0_Init()
+'    PWM1_Set_Duty(j)
+'    PWM2_Set_Duty(j)
+'    PWM3_Set_Duty(j)   ' Se
+
+
+'    PWM1_Init(_PWM1_FAST_MODE, _PWM1_PRESCALER_8, _PWM1_NON_INVERTED, 127)''PWM1_Init(5000)'' Initialize PWM1
+'     PWM2_Init(_PWM2_FAST_MODE, _PWM2_PRESCALER_8, _PWM2_NON_INVERTED,127) ''PWM2_Init(5000)'' Initialize PWM2
+'    PWM26bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, 255, _TIMER2)
+
+'    PWM1_Start()'' start PWM1
+'    PWM2_Start()'' start PWM2
+
+'    PWM1_Set_Duty(j)''Set current duty for PWM1
+'    PWM2_Set_Duty(j)''Set current duty for PWM2
+'    ASSR=0x00
+'    TCCR2=0x27
+'    TCNT2=0x00
+     ASSR=0x00
+'     TCCR2=0x6F
+''     TCCR0=(1<<WGM00) or (1<<COM01) or (1<<COM00) or (1<<WGM01) or (1<<CS02) or (0<<CS01) or (1<<CS00)
+'     TCCR0=(0<<WGM00) or (1<<COM01) or (1<<COM00) or (1<<WGM01) or (1<<CS02) or (0<<CS01) or (1<<CS00)
+'     TCCR0 = (1<<FOC0)or(1<<COM01)or(1<<COM00)or(0<<COM01)or(1<<WGM00) or(1<<CS00) or (0<<WGM01)
+'      TCCR0 = (1<<FOC2)or(1<<COM00)or(1<<COM01)or(1<<WGM00) or(0<<WGM01)or(1<<CS00) or(0<<CS01) or(1<<CS02) or (0<<WGM21)
+     TCNT0=0x00
+'     TCCR2 = (1<<FOC2)or(1<<COM21)or(1<<COM20)or(0<<COM21)or(1<<WGM20) or(1<<CS00) ''or (1<<WGM21)
+'     TCCR2 = (1<<FOC2)or(1<<COM21)or(1<<COM20)or(0<<COM21)or(1<<WGM20) or(1<<CS00)or(0<<CS01) or(1<<CS02) or (0<<WGM21)
+'     TCCR2 = (1<<FOC2)or(1<<COM01)or(0<<COM00)or(1<<WGM00) or(0<<WGM01)or(1<<CS00) or(0<<CS01) or(1<<CS02) or (0<<WGM21)
+     TCNT2=0x00
+'     ocr0=0xFF
+'     ocr2=0xFF
+'    PWM16bit_Init(_PWM16_FAST_MODE_9BIT, _PWM16_PRESCALER_16bit_1, _PWM16_INVERTED, 255, 1)
+'    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, 255, _TIMER1)
+'    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_1024, _PWM16_NON_INVERTED, 255, _TIMER1)
+'     PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_1024, _PWM16_NON_INVERTED, 0, _TIMER0_CH_a)
+'     PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_1024, _PWM16_NON_INVERTED, 0, _TIMER0_CH_B)
+    PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT, _PWM16_PRESCALER_16bit_1024, _PWM16_NON_INVERTED, 0, _TIMER1)
+'    PWM_MAKE (Mot_heater_On_mSec [chanel-1][Heater_motor_index-1][Pwm_chanel_main-1][3],255,Pwm_chanel_main)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'
+'    for k=0 to 10  step 5
+'        PWM_MAKE (k*10,255,1)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,2)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,3)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,4)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,5)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        delay_ms(10)
+'    next k
+'    delay_ms(300)
+'    for k=10 to 0  step -5
+'        PWM_MAKE (k*10,255,1)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,2)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,3)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,4)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        PWM_MAKE (k*10,255,5)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'        delay_ms(10)
+'    next k
+'    PWM_MAKE (0,255,4)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
+'    PWM2_Init(_PWM2_FAST_MODE, _PWM2_PRESCALER_8, _PWM2_NON_INVERTED,0) ''PWM2_Init(5000)'' Initialize PWM2
+'    ocr2=0
+'    PWM_MAKE (100,255,1)
+'    PWM_MAKE (100,255,2)
+'    PWM_MAKE (100,255,3)
+'    PWM_MAKE (100,255,4)
+'    PWM_MAKE (100,255,5)
+'    PWM_MAKE (100,255,6)
+'    PWM_MAKE (100,255,7)
+'    delay_ms(100)
+'    PWM_MAKE (0,255,1)
+'    PWM_MAKE (0,255,2)
+'    PWM_MAKE (0,255,3)
+'    PWM_MAKE (0,255,4)
+'    PWM_MAKE (0,255,5)
+'    PWM_MAKE (0,255,6)
+'    PWM_MAKE (0,255,7)
+
+'    SetPWM0(0)
+end sub
+
+sub procedure  On_mSec_initial_heater (dim en,mint,sec,prc as byte)'',dim prc as integer)
+' on_off2=1       'on time
+     dim Pwm_chanel_ini,chanel_ini,Heater_Motor_Time_ini as byte
+     Lcd_0() lcd_out(1,1,"Initialsiing Heater")
+     delay_ms(100)
+     for chanel_ini =1 to 7
+     for Heater_Motor_Time_ini=1 to 2 ''Heater
+     for Pwm_chanel_ini =1 to 3
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][0] =en
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][1]=mint
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][2] =sec
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][3]=prc
+'      Delay_mS(1000)
+'       next on_off2
+      next Pwm_chanel_ini
+      next Heater_Motor_Time_ini
+      next chanel_ini
+end sub
+ sub procedure  On_mSec_initial_Motor (dim en,mint,sec,prc as byte)
+' on_off2=1       'on time
+dim Pwm_chanel_ini,chanel_ini,Heater_Motor_Time_ini as byte
+     Lcd_0() lcd_out(1,1,"Initialsiing Motor")
+     delay_ms(100)
+     for chanel_ini =1 to 7
+     for Heater_Motor_Time_ini=2 to 2 ''Motor
+     for Pwm_chanel_ini =2 to 3
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][0] =en
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][1]=mint
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][2] =sec
+         Mot_heater_On_mSec [chanel_ini-1][Heater_Motor_Time_ini-1][Pwm_chanel_ini-1][3]=prc
+'      Delay_mS(1000)
+'       next on_off2
+      next Pwm_chanel_ini
+      next Heater_Motor_Time_ini
+      next chanel_ini
+end sub
+sub procedure  WDT_on()
+
+
+
+'/* reset WDT */
+
+'_WDR()
+
+'|--------------------------------------------------------------------|
+'| Watchdog Timer Prescale Select                           |
+'|--------------------------------------------------------------------|
+'| WDP3 WDP2 WDP1 WDP0   Number of WDT            Typical Time-out    |
+'|                      Oscillator Cycles         at VCC = 5.0V       |
+'|--------------------------------------------------------------------|
+'|  0   0   0    0   |    2K (2048) cycles           16 ms            |
+'|  0   0   0    1   |    4K (4096) cycles           32 ms            |
+'|  0   0   1    0   |    8K (8192) cycles           64 ms            |
+'|  0   0   1    1   |   16K (16384) cycles        0.125 s            |
+'|  0   1   0    0   |   32K (32768) cycles         0.25 s            |
+'|  0   1   0    1   |   64K (65536) cycles          0.5 s            |
+'|  0   1   1    0   |  128K (131072) cycles         1.0 s            |
+'|  0   1   1    1   |  256K (262144) cycles         2.0 s            |
+'|  1   0   0    0   |  512K (524288) cycles         4.0 s            |
+'|  1   0   0    1   | 1024K (1048576) cycles        8.0 s            |
+'|  1   0   1    0   |------------------------------------------------|
+'|  1   0   1    1   |                                                |
+'|  1   1   0    0   |                                                |
+'|  1   1   0    1   |                 R E S E R V E D                |
+'|  1   1   1    0   |                                                |
+'|  1   1   1    1   |                                                |
+'|--------------------------------------------------------------------|
+'/* Write logical one to WDCE and WDE */
+ WDTCR =(1<<WDP2) or (1<<WDP1)  or (1<<WDP0)
+' WDTCR = 0x0F   ' //prescaller time 1,8s
+' //////////////////////////////////watchdog enable
+'WDTCR |= (1<<WDCE) | (1<<WDE)  ''//watchdog enable
+'WDTCR = 0x0F   ' //prescaller time 1,8s
+'//////////////////////////////////watchdog enable
+ Lcd_Cmd(_LCD_CLEAR)
+ Lcd_Out(2,2,"Reset.")
+'WDTCR = 0x00
+'WDTCR |= (1<<
+
+
+
+end sub
+'sub procedure  WDT_on()
+' Lcd_Cmd(_LCD_CLEAR)
+' Lcd_Out(2,2,"No Reset.")
+'end
+
+end.
