@@ -124,9 +124,9 @@ _PWM_MAKE:
 ;Libs/PWM_timers_2017.mbas,103 :: 		case 2
 	LDI        R27, 2
 	CP         R4, R27
-	BREQ       L__PWM_MAKE83
+	BREQ       L__PWM_MAKE89
 	JMP        L__PWM_MAKE7
-L__PWM_MAKE83:
+L__PWM_MAKE89:
 ;Libs/PWM_timers_2017.mbas,106 :: 		PWM16bit_Change_Duty(ii,_TIMER1_CH_B )
 	LDI        R27, 18
 	MOV        R4, R27
@@ -144,9 +144,9 @@ L__PWM_MAKE7:
 ; ii start address is: 18 (R18)
 	LDI        R27, 1
 	CP         R4, R27
-	BREQ       L__PWM_MAKE84
+	BREQ       L__PWM_MAKE90
 	JMP        L__PWM_MAKE10
-L__PWM_MAKE84:
+L__PWM_MAKE90:
 ;Libs/PWM_timers_2017.mbas,111 :: 		PWM16bit_Change_Duty(ii,_TIMER1_CH_A )
 	LDI        R27, 17
 	MOV        R4, R27
@@ -164,15 +164,15 @@ L__PWM_MAKE10:
 ; ii start address is: 18 (R18)
 	LDI        R27, 4
 	CP         R4, R27
-	BREQ       L__PWM_MAKE85
+	BREQ       L__PWM_MAKE91
 	JMP        L__PWM_MAKE13
-L__PWM_MAKE85:
+L__PWM_MAKE91:
 ;Libs/PWM_timers_2017.mbas,144 :: 		if jj=0 then
 	LDI        R27, 0
 	CP         R2, R27
-	BREQ       L__PWM_MAKE86
+	BREQ       L__PWM_MAKE92
 	JMP        L__PWM_MAKE15
-L__PWM_MAKE86:
+L__PWM_MAKE92:
 ; ii end address is: 18 (R18)
 ;Libs/PWM_timers_2017.mbas,145 :: 		SetPWM2(0)
 	CLR        R2
@@ -194,9 +194,9 @@ L__PWM_MAKE13:
 ; ii start address is: 18 (R18)
 	LDI        R27, 45
 	CP         R4, R27
-	BREQ       L__PWM_MAKE87
+	BREQ       L__PWM_MAKE93
 	JMP        L__PWM_MAKE19
-L__PWM_MAKE87:
+L__PWM_MAKE93:
 ;Libs/PWM_timers_2017.mbas,155 :: 		PWM16bit_Change_Duty(ii,2 )
 	LDI        R27, 2
 	MOV        R4, R27
@@ -209,15 +209,15 @@ L__PWM_MAKE19:
 ; ii start address is: 18 (R18)
 	LDI        R27, 25
 	CP         R4, R27
-	BREQ       L__PWM_MAKE88
+	BREQ       L__PWM_MAKE94
 	JMP        L__PWM_MAKE22
-L__PWM_MAKE88:
+L__PWM_MAKE94:
 ;Libs/PWM_timers_2017.mbas,161 :: 		if jj=0 then
 	LDI        R27, 0
 	CP         R2, R27
-	BREQ       L__PWM_MAKE89
+	BREQ       L__PWM_MAKE95
 	JMP        L__PWM_MAKE24
-L__PWM_MAKE89:
+L__PWM_MAKE95:
 ;Libs/PWM_timers_2017.mbas,162 :: 		SetPWM1_A(max_duty-ii)
 	MOV        R16, R3
 	LDI        R17, 0
@@ -246,15 +246,15 @@ L__PWM_MAKE22:
 ; ii start address is: 18 (R18)
 	LDI        R27, 35
 	CP         R4, R27
-	BREQ       L__PWM_MAKE90
+	BREQ       L__PWM_MAKE96
 	JMP        L__PWM_MAKE28
-L__PWM_MAKE90:
+L__PWM_MAKE96:
 ;Libs/PWM_timers_2017.mbas,170 :: 		if jj=0 then
 	LDI        R27, 0
 	CP         R2, R27
-	BREQ       L__PWM_MAKE91
+	BREQ       L__PWM_MAKE97
 	JMP        L__PWM_MAKE30
-L__PWM_MAKE91:
+L__PWM_MAKE97:
 ;Libs/PWM_timers_2017.mbas,171 :: 		SetPWM1_B(max_duty-ii)
 	MOV        R16, R3
 	LDI        R17, 0
@@ -282,25 +282,25 @@ L__PWM_MAKE28:
 ;Libs/PWM_timers_2017.mbas,177 :: 		case 5
 	LDI        R27, 5
 	CP         R4, R27
-	BREQ       L__PWM_MAKE92
+	BREQ       L__PWM_MAKE98
 	JMP        L__PWM_MAKE34
-L__PWM_MAKE92:
+L__PWM_MAKE98:
 	JMP        L__PWM_MAKE4
 L__PWM_MAKE34:
 ;Libs/PWM_timers_2017.mbas,181 :: 		case 6
 	LDI        R27, 6
 	CP         R4, R27
-	BREQ       L__PWM_MAKE93
+	BREQ       L__PWM_MAKE99
 	JMP        L__PWM_MAKE37
-L__PWM_MAKE93:
+L__PWM_MAKE99:
 	JMP        L__PWM_MAKE4
 L__PWM_MAKE37:
 ;Libs/PWM_timers_2017.mbas,185 :: 		case 7
 	LDI        R27, 7
 	CP         R4, R27
-	BREQ       L__PWM_MAKE94
+	BREQ       L__PWM_MAKE100
 	JMP        L__PWM_MAKE40
-L__PWM_MAKE94:
+L__PWM_MAKE100:
 	JMP        L__PWM_MAKE4
 L__PWM_MAKE40:
 L__PWM_MAKE4:
@@ -418,28 +418,28 @@ _dispaly_time:
 	LDS        R17, _target_min+0
 	CP         R17, R16
 	LDI        R19, 0
-	BRSH       L__dispaly_time99
+	BRSH       L__dispaly_time105
 	LDI        R19, 255
-L__dispaly_time99:
+L__dispaly_time105:
 	LDS        R16, _minutes_alarm_clock+0
 	CP         R16, R17
 	LDI        R18, 0
-	BRNE       L__dispaly_time100
+	BRNE       L__dispaly_time106
 	LDI        R18, 255
-L__dispaly_time100:
+L__dispaly_time106:
 	LDS        R17, _second_alarm_clock+0
 	LDS        R16, _target_sec+0
 	CP         R16, R17
 	LDI        R27, 0
-	BRSH       L__dispaly_time101
+	BRSH       L__dispaly_time107
 	LDI        R27, 255
-L__dispaly_time101:
+L__dispaly_time107:
 	MOV        R16, R27
 	AND        R16, R18
 	OR         R16, R19
-	BRNE       L__dispaly_time102
+	BRNE       L__dispaly_time108
 	JMP        L__dispaly_time46
-L__dispaly_time102:
+L__dispaly_time108:
 ;Libs/PWM_timers_2017.mbas,423 :: 		PWM2_Set_Duty(0) end_flag=0
 	CLR        R2
 	CALL       _PWM2_Set_Duty+0
@@ -520,34 +520,34 @@ _motor_on_off:
 	LDI        R27, 1
 	STS        _jj+0, R27
 	CALL       _dispaly_time+0
-;Libs/PWM_timers_2017.mbas,435 :: 		while (minutes_alarm_clock<target_min) or ((minutes_alarm_clock=target_min) and  (second_alarm_clock<target_sec))
+;Libs/PWM_timers_2017.mbas,436 :: 		while (minutes_alarm_clock<target_min) or ((minutes_alarm_clock=target_min) and  (second_alarm_clock<target_sec))
 L__motor_on_off50:
 	LDS        R16, _minutes_alarm_clock+0
 	LDS        R17, _target_min+0
 	CP         R16, R17
 	LDI        R19, 0
-	BRSH       L__motor_on_off104
+	BRSH       L__motor_on_off110
 	LDI        R19, 255
-L__motor_on_off104:
+L__motor_on_off110:
 	LDS        R16, _minutes_alarm_clock+0
 	CP         R16, R17
 	LDI        R18, 0
-	BRNE       L__motor_on_off105
+	BRNE       L__motor_on_off111
 	LDI        R18, 255
-L__motor_on_off105:
+L__motor_on_off111:
 	LDS        R17, _second_alarm_clock+0
 	LDS        R16, _target_sec+0
 	CP         R17, R16
 	LDI        R16, 0
-	BRSH       L__motor_on_off106
+	BRSH       L__motor_on_off112
 	LDI        R16, 255
-L__motor_on_off106:
+L__motor_on_off112:
 	AND        R16, R18
 	OR         R16, R19
-	BRNE       L__motor_on_off107
+	BRNE       L__motor_on_off113
 	JMP        L__motor_on_off51
-L__motor_on_off107:
-;Libs/PWM_timers_2017.mbas,436 :: 		Display_Number(minutes_alarm_clock*100+second_alarm_clock)
+L__motor_on_off113:
+;Libs/PWM_timers_2017.mbas,437 :: 		Display_Number(minutes_alarm_clock*100+second_alarm_clock)
 	LDS        R16, _minutes_alarm_clock+0
 	LDI        R17, 0
 	LDI        R20, 100
@@ -559,17 +559,17 @@ L__motor_on_off107:
 	ADC        R17, R27
 	MOVW       R2, R16
 	CALL       _Display_Number+0
-;Libs/PWM_timers_2017.mbas,437 :: 		if jj=1 then
+;Libs/PWM_timers_2017.mbas,438 :: 		if jj=1 then
 	LDS        R16, _jj+0
 	CPI        R16, 1
-	BREQ       L__motor_on_off108
+	BREQ       L__motor_on_off114
 	JMP        L__motor_on_off55
-L__motor_on_off108:
-;Libs/PWM_timers_2017.mbas,438 :: 		for j=0 to 5
+L__motor_on_off114:
+;Libs/PWM_timers_2017.mbas,439 :: 		for j=0 to 7
 	LDI        R27, 0
 	STS        _j+0, R27
 L__motor_on_off58:
-;Libs/PWM_timers_2017.mbas,439 :: 		PWM2_Set_Duty(integer (j*255/10)) delay_ms(100)dispaly_time()
+;Libs/PWM_timers_2017.mbas,440 :: 		PWM2_Set_Duty(integer (j*255/10)) delay_ms(100) dispaly_time()
 	LDS        R16, _j+0
 	LDI        R17, 0
 	LDI        R20, 255
@@ -592,47 +592,49 @@ L__motor_on_off62:
 	DEC        R18
 	BRNE       L__motor_on_off62
 	CALL       _dispaly_time+0
-;Libs/PWM_timers_2017.mbas,440 :: 		next j
+;Libs/PWM_timers_2017.mbas,441 :: 		next j
 	LDS        R16, _j+0
-	CPI        R16, 5
-	BRNE       L__motor_on_off109
+	CPI        R16, 7
+	BRNE       L__motor_on_off115
 	JMP        L__motor_on_off61
-L__motor_on_off109:
+L__motor_on_off115:
 	LDS        R16, _j+0
 	SUBI       R16, 255
 	STS        _j+0, R16
 	JMP        L__motor_on_off58
 L__motor_on_off61:
-L__motor_on_off55:
-;Libs/PWM_timers_2017.mbas,443 :: 		Start_seconds=second_alarm_clock  jj=0
-	LDS        R16, _second_alarm_clock+0
-	STS        _Start_seconds+0, R16
-	LDI        R27, 0
-	STS        _jj+0, R27
-;Libs/PWM_timers_2017.mbas,444 :: 		while  second_alarm_clock<=Start_seconds+target_interval
-L__motor_on_off65:
-	LDS        R17, _Start_seconds+0
-	LDS        R16, _target_interval+0
-	ADD        R17, R16
-	LDS        R16, _second_alarm_clock+0
-	CP         R17, R16
-	BRSH       L__motor_on_off110
-	JMP        L__motor_on_off66
-L__motor_on_off110:
-;Libs/PWM_timers_2017.mbas,445 :: 		if jj=0 then
-	LDS        R16, _jj+0
-	CPI        R16, 0
-	BREQ       L__motor_on_off111
-	JMP        L__motor_on_off70
-L__motor_on_off111:
-;Libs/PWM_timers_2017.mbas,446 :: 		jj=1
+;Libs/PWM_timers_2017.mbas,442 :: 		for j=1 to 20
 	LDI        R27, 1
-	STS        _jj+0, R27
-;Libs/PWM_timers_2017.mbas,447 :: 		for j=motor_power to 0 step -1
-	LDI        R27, 5
 	STS        _j+0, R27
-L__motor_on_off73:
-;Libs/PWM_timers_2017.mbas,448 :: 		PWM2_Set_Duty(integer (j*255/10))  delay_ms(100)  dispaly_time()
+L__motor_on_off65:
+;Libs/PWM_timers_2017.mbas,443 :: 		dispaly_time() delay_ms(100)
+	CALL       _dispaly_time+0
+	LDI        R18, lo_addr(R5)
+	LDI        R17, lo_addr(R15)
+	LDI        R16, 242
+L__motor_on_off69:
+	DEC        R16
+	BRNE       L__motor_on_off69
+	DEC        R17
+	BRNE       L__motor_on_off69
+	DEC        R18
+	BRNE       L__motor_on_off69
+;Libs/PWM_timers_2017.mbas,444 :: 		next j
+	LDS        R16, _j+0
+	CPI        R16, 20
+	BRNE       L__motor_on_off116
+	JMP        L__motor_on_off68
+L__motor_on_off116:
+	LDS        R16, _j+0
+	SUBI       R16, 255
+	STS        _j+0, R16
+	JMP        L__motor_on_off65
+L__motor_on_off68:
+;Libs/PWM_timers_2017.mbas,446 :: 		for j=7 to 0 step -1
+	LDI        R27, 7
+	STS        _j+0, R27
+L__motor_on_off72:
+;Libs/PWM_timers_2017.mbas,447 :: 		PWM2_Set_Duty(integer (j*255/10))  delay_ms(100)  dispaly_time()
 	LDS        R16, _j+0
 	LDI        R17, 0
 	LDI        R20, 255
@@ -647,39 +649,59 @@ L__motor_on_off73:
 	LDI        R18, lo_addr(R5)
 	LDI        R17, lo_addr(R15)
 	LDI        R16, 242
-L__motor_on_off77:
+L__motor_on_off76:
 	DEC        R16
-	BRNE       L__motor_on_off77
+	BRNE       L__motor_on_off76
 	DEC        R17
-	BRNE       L__motor_on_off77
+	BRNE       L__motor_on_off76
 	DEC        R18
-	BRNE       L__motor_on_off77
+	BRNE       L__motor_on_off76
 	CALL       _dispaly_time+0
-;Libs/PWM_timers_2017.mbas,449 :: 		next j
+;Libs/PWM_timers_2017.mbas,448 :: 		next j
 	LDS        R16, _j+0
 	CPI        R16, 0
-	BRNE       L__motor_on_off112
-	JMP        L__motor_on_off76
-L__motor_on_off112:
+	BRNE       L__motor_on_off117
+	JMP        L__motor_on_off75
+L__motor_on_off117:
 	LDS        R16, _j+0
 	SUBI       R16, 1
 	STS        _j+0, R16
-	JMP        L__motor_on_off73
-L__motor_on_off76:
-L__motor_on_off70:
-;Libs/PWM_timers_2017.mbas,451 :: 		PWM2_Set_Duty(0)  dispaly_time()
-	CLR        R2
-	CALL       _PWM2_Set_Duty+0
+	JMP        L__motor_on_off72
+L__motor_on_off75:
+;Libs/PWM_timers_2017.mbas,450 :: 		for j=1 to 10
+	LDI        R27, 1
+	STS        _j+0, R27
+L__motor_on_off79:
+;Libs/PWM_timers_2017.mbas,451 :: 		dispaly_time() delay_ms(100)
 	CALL       _dispaly_time+0
-;Libs/PWM_timers_2017.mbas,452 :: 		wend
-	JMP        L__motor_on_off65
-L__motor_on_off66:
-;Libs/PWM_timers_2017.mbas,456 :: 		wend
+	LDI        R18, lo_addr(R5)
+	LDI        R17, lo_addr(R15)
+	LDI        R16, 242
+L__motor_on_off83:
+	DEC        R16
+	BRNE       L__motor_on_off83
+	DEC        R17
+	BRNE       L__motor_on_off83
+	DEC        R18
+	BRNE       L__motor_on_off83
+;Libs/PWM_timers_2017.mbas,452 :: 		next j
+	LDS        R16, _j+0
+	CPI        R16, 10
+	BRNE       L__motor_on_off118
+	JMP        L__motor_on_off82
+L__motor_on_off118:
+	LDS        R16, _j+0
+	SUBI       R16, 255
+	STS        _j+0, R16
+	JMP        L__motor_on_off79
+L__motor_on_off82:
+L__motor_on_off55:
+;Libs/PWM_timers_2017.mbas,469 :: 		wend
 	JMP        L__motor_on_off50
 L__motor_on_off51:
-;Libs/PWM_timers_2017.mbas,457 :: 		dispaly_time()
+;Libs/PWM_timers_2017.mbas,470 :: 		dispaly_time()
 	CALL       _dispaly_time+0
-;Libs/PWM_timers_2017.mbas,464 :: 		end sub
+;Libs/PWM_timers_2017.mbas,477 :: 		end sub
 L_end_motor_on_off:
 	POP        R3
 	POP        R2

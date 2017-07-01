@@ -432,24 +432,37 @@ end sub
  sub procedure motor_on_off()
     
     jj=1  dispaly_time()
+'    if ((minutes_alarm_clock=target_min) and  (second_alarm_clock<target_sec)) then Display_Number_2(0,"EEE") end if
      while (minutes_alarm_clock<target_min) or ((minutes_alarm_clock=target_min) and  (second_alarm_clock<target_sec))
          Display_Number(minutes_alarm_clock*100+second_alarm_clock)
          if jj=1 then
-           for j=0 to 5
-              PWM2_Set_Duty(integer (j*255/10)) delay_ms(100)dispaly_time()
+           for j=0 to 7
+              PWM2_Set_Duty(integer (j*255/10)) delay_ms(100) dispaly_time()
+           next j
+           for j=1 to 20
+               dispaly_time() delay_ms(100)
            next j
 
-         end if
-         Start_seconds=second_alarm_clock  jj=0
-         while  second_alarm_clock<=Start_seconds+target_interval
-             if jj=0 then
-               jj=1
-               for j=motor_power to 0 step -1
+           for j=7 to 0 step -1
                    PWM2_Set_Duty(integer (j*255/10))  delay_ms(100)  dispaly_time()
-               next j
-             end if
-             PWM2_Set_Duty(0)  dispaly_time()
-          wend
+           next j
+
+           for j=1 to 10
+               dispaly_time() delay_ms(100)
+           next j
+           
+         end if
+         'Start_seconds=second_alarm_clock  jj=0
+'         while  second_alarm_clock<=Start_seconds+target_interval
+'             if Start_seconds>59-target_interval then  delay_ms(1000) Start_seconds=0 end if
+'             if jj=0 then
+'               jj=1
+'               for j=motor_power to 0 step -1
+'                   PWM2_Set_Duty(integer (j*255/10))  delay_ms(100)  dispaly_time()
+'               next j
+'             end if
+'             PWM2_Set_Duty(0)  dispaly_time()
+'          wend
 
 
 

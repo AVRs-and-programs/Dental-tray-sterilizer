@@ -8,7 +8,7 @@ Value=0
 [BOOT_TYPE]
 Value=0
 [ACTIVE_TAB]
-Value=7segment displays.mbas
+Value=Libs\PWM_timers_2017.mbas
 [USE_EEPROM]
 Value=0
 [USE_HEAP]
@@ -42,12 +42,13 @@ Count=0
 [OTHER_FILES]
 Count=0
 [SEARCH_PATH]
-Count=5
+Count=6
 Path0=E:\Program Files (x86)\mikroBasic PRO for AVR2\defs\
 Path1=E:\Program Files (x86)\mikroBasic PRO for AVR2\uses\lte64kw\
-Path2=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\
-Path3=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2\
-Path4=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy\
+Path2=C:\Users\Hamed\IGC\Desktop\ss\tray 1 - Copy2 - Copy (2)\
+Path3=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2 - Copy (2)\
+Path4=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy2\
+Path5=C:\Users\Hamed\IGC\Desktop\tray 1 - Copy\
 [HEADER_PATH]
 Count=0
 [HEADERS]

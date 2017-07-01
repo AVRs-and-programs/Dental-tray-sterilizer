@@ -41,7 +41,7 @@ dim Mot_On_mSec as Byte[5]  ''[sec_interval-> 4][PWM-> 3][MIN -> 2][SEC->2][Enab
 DIM oldstate_1,oldstate_2,oldstate_3,oldstate_setting AS BIT
     while_state,while_state_setting,while_state_setting_2,while_state_help as byte
  
- const _THRESHOLD = 16
+ const _THRESHOLD = 14
  
 dim counter as byte
 '
@@ -73,7 +73,7 @@ END SUB
    end if
    if (end_flag=0) then
 
-          for j=1 to 50
+          for j=1 to 40
             Display_Number(minutes_alarm_clock*100+second_alarm_clock)
           next j
       if  minutes_alarm_clock<target_min+Ready_min_interval then
@@ -87,14 +87,17 @@ END SUB
    while (while_state<11)
         inc(while_state)
 '       if Start_seconds<> second_alarm_clock then  while_state=11 end if
-       if (Button(Start_SW_Port, Start_SW_bit, 70, 1)) then    ' Detect logical one up key
-          oldstate_1 = 1                      ' Update flag
-       end if
+       for j=1 to 4
+           if (Button(Start_SW_Port, Start_SW_bit, 70, 1)) then    ' Detect logical one up key
+              oldstate_1 = 1                      ' Update flag
+           end if
+      next j
        if (oldstate_1 and Button(Start_SW_Port, Start_SW_bit,50,0)) then
-           oldstate_1=0   while_state=11
+           oldstate_1=0   while_state=14
            reset_alarm_clock()                           'Reset laram click for better counting
            
            motor_on_off()
+           oldstate_1=0 while_state=14
           ' for j=0 to 10
 '             nn=floor(j*255/10)
 '             PWM2_Set_Duty(nn) delay_ms(100) Display_Number(nn)
@@ -220,6 +223,7 @@ main:
 '   PWM_MAKE (1,255,1)''(dim jj as byte,dim max_duty,Pwm_chanel as integer)
 '  timer2_init()
 
+'  PWM16bit_Init(_PWM16_PHASE_CORRECT_MODE_8BIT,_PWM16_PRESCALER_16bit_8, _PWM16_NON_INVERTED, 0, _TIMER1_CH_A)
 
 
               
@@ -237,12 +241,14 @@ main:
 '         Start_seconds=second_alarm_clock Start_minutes=minutes_alarm_clock Start_hours=hours_alarm_clock
 '         DS1307(hours, minutes, seconds) 'seconds=target_sec minutes=target_min hours=target_hr
          ok()
-
+'            PWM2_Set_Duty(1)
+            'PWM16bit_Change_Duty(90,_TIMER1_CH_A )
+'             PWM16bit_Change_Duty(90,_TIMER1_CH_B )
 '          Display_Number(minutes_alarm_clock*100+second_alarm_clock)
 '         motor_on_off()
 '          Display_Number(1)
 '          Display_text("END")
-
+'          Display_Number(target_min*100+target_sec)
 
 
 
